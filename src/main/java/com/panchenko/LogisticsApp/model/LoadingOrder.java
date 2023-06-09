@@ -1,5 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
+import com.panchenko.LogisticsApp.model.enums.OrderStatus;
 import com.panchenko.LogisticsApp.model.enums.PetroleumType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,8 @@ public class LoadingOrder {
 
     @Column(name = "loading_date_time", nullable = false)
     private LocalDateTime loadingDateTime;
+    @Column(name = "status", nullable = false)
+    private OrderStatus orderStatus;
 
     @ManyToOne
     @JoinColumn(name = "tasks_list_id", referencedColumnName = "id")

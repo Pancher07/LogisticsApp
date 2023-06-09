@@ -9,14 +9,12 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "managers")
 public class Manager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -29,4 +27,8 @@ public class Manager {
 
     @OneToMany(mappedBy = "manager")
     private List<ManagerOrder> managerOrders;
+
+    public Manager(User user) {
+        this.user = user;
+    }
 }

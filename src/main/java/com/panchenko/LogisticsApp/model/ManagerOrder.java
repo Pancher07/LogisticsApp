@@ -1,15 +1,11 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.Contractor;
-import com.panchenko.LogisticsApp.model.Hitch;
-import com.panchenko.LogisticsApp.model.Manager;
-import com.panchenko.LogisticsApp.model.TasksList;
+import com.panchenko.LogisticsApp.model.enums.OrderStatus;
 import com.panchenko.LogisticsApp.model.enums.TypeOfLightProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.web.JsonPath;
 
 import java.time.LocalDateTime;
 
@@ -44,6 +40,9 @@ public class ManagerOrder {
     @Column(name = "uploading_date_time", nullable = false)
     private LocalDateTime uploadingDateTime;
 
+    @Column(name = "status", nullable = false)
+    private OrderStatus orderStatus;
+
     @ManyToOne
     @JoinColumn(name = "contractor_id", referencedColumnName = "id")
     private Contractor contractor;
@@ -59,5 +58,4 @@ public class ManagerOrder {
     @OneToOne
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")
     private Hitch hitch;
-
 }
