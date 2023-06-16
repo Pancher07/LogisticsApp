@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.UserDTO;
-import com.panchenko.LogisticsApp.exception.forUser.UserNotCreatedException;
-import com.panchenko.LogisticsApp.repository.UserRepository;
+import com.panchenko.LogisticsApp.exception.UserException.UserNotCreatedException;
+import com.panchenko.LogisticsApp.exception.UserException.UserNotUpdatedException;
+import com.panchenko.LogisticsApp.model.User;
 import com.panchenko.LogisticsApp.service.UserService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +20,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository, ModelMapper modelMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
     }
 
     @GetMapping
@@ -57,5 +53,48 @@ public class UserController {
         userService.create(userService.convertToUser(userDTO));
 
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid UserDTO userDTO,
+                                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMessage = new StringBuilder();
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for (FieldError error : errors) {
+                errorMessage.append(error.getField())
+                        .append("-").append(error.getDefaultMessage())
+                        .append(";");
+            }
+            throw new UserNotUpdatedException(errorMessage.toString());
+        }
+        User updatedUser = userService.readById(id);
+
+        if (userDTO.getName() != null) {
+            updatedUser.setName(userDTO.getName());
+        }
+        if (userDTO.getSurname() != null) {
+            updatedUser.setSurname(userDTO.getSurname());
+        }
+        if (userDTO.getEmail() != null) {
+            updatedUser.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getPhone() != null) {
+            updatedUser.setPhone(userDTO.getPhone());
+        }
+        if (userDTO.getLogin() != null) {
+            updatedUser.setLogin(userDTO.getLogin());
+        }
+        if (userDTO.getPassword() != null) {
+            updatedUser.setPassword(userDTO.getPassword());
+        }
+
+        userService.update(updatedUser);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable long id) {
+        userService.delete(id);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

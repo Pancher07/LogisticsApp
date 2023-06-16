@@ -2,7 +2,7 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.UserDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.forUser.UserNotFoundException;
+import com.panchenko.LogisticsApp.exception.UserException.UserNotFoundException;
 import com.panchenko.LogisticsApp.model.Logistician;
 import com.panchenko.LogisticsApp.model.Manager;
 import com.panchenko.LogisticsApp.model.User;
@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
     public User convertToUser(UserDTO userDTO) {
         return modelMapper.map(userDTO, User.class);
     }
+
     public UserDTO convertToUserDTO(User user) {
         return modelMapper.map(user, UserDTO.class);
     }
@@ -65,11 +66,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        if (user != null) {
-            readById(user.getId());
-            return userRepository.save(user);
+        if (user == null) {
+            throw new NullEntityReferenceException("User cannot be 'null'");
         }
-        throw new NullEntityReferenceException("User cannot be 'null'");
+        readById(user.getId());
+        return userRepository.save(user);
     }
 
     @Override

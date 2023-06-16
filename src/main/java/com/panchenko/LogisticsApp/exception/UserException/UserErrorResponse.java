@@ -1,4 +1,4 @@
-package com.panchenko.LogisticsApp.exception.forUser;
+package com.panchenko.LogisticsApp.exception.UserException;
 
 public class UserErrorResponse {
     private String message;

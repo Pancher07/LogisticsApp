@@ -1,7 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enums.OrderStatus;
-import com.panchenko.LogisticsApp.model.enums.TypeOfLightProduct;
+import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
+import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

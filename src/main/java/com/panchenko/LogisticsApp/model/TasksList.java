@@ -1,6 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enums.TasksListStatus;
+import com.panchenko.LogisticsApp.model.enumeration.TasksListStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

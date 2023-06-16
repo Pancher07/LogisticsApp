@@ -1,5 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
+import com.panchenko.LogisticsApp.model.enumeration.PresenceOfAPump;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class TruckTractor {
     private String model;
 
     @Column(name = "pump", nullable = false)
-    private boolean pump;
+    private PresenceOfAPump pump;
 
     @OneToOne
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")

@@ -1,7 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enums.ProjectCountry;
-import com.panchenko.LogisticsApp.model.enums.PetroleumType;
+import com.panchenko.LogisticsApp.model.enumeration.ProjectCountry;
+import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
