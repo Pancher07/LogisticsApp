@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
+import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,9 +27,9 @@ public class Trailer {
     private double volume;
 
     @Column(name = "calibration", nullable = false)
-    private boolean calibration;
+    private PresenceOfPumpOrCalibration calibration;
 
-    @Column(name = "petroleum_type")
+    @Column(name = "petroleum_type", nullable = false)
     private PetroleumType petroleumType;
 
     @OneToOne

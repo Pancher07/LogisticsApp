@@ -4,6 +4,10 @@ import com.panchenko.LogisticsApp.exception.DriverException.DriverErrorResponse;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotFoundException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.TrailerException.TrailerErrorResponse;
+import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotCreatedException;
+import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotFoundException;
+import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotUpdatedException;
 import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorErrorResponse;
 import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorNotCreatedException;
 import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorNotFoundException;
@@ -89,6 +93,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<TruckTractorErrorResponse> handleTruckTractorNotUpdatedException(TruckTractorNotUpdatedException ex) {
         TruckTractorErrorResponse response = new TruckTractorErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<TrailerErrorResponse> handleTrailerNotFoundException(TrailerNotFoundException ex) {
+        TrailerErrorResponse response = new TrailerErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<TrailerErrorResponse> handleTrailerNotCreatedException(TrailerNotCreatedException ex) {
+        TrailerErrorResponse response = new TrailerErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<TrailerErrorResponse> handleTrailerNotUpdatedException(TrailerNotUpdatedException ex) {
+        TrailerErrorResponse response = new TrailerErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

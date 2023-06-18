@@ -1,6 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enumeration.PresenceOfAPump;
+import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class TruckTractor {
     private String model;
 
     @Column(name = "pump", nullable = false)
-    private PresenceOfAPump pump;
+    private PresenceOfPumpOrCalibration pump;
 
     @OneToOne
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")
