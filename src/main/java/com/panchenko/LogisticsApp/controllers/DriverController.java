@@ -80,6 +80,9 @@ public class DriverController {
         if (driverDTO.getPhone() != null) {
             updatedDriver.setPhone(driverDTO.getPhone());
         }
+        if (driverDTO.getLastTimeWorked() != null) {
+            updatedDriver.setLastTimeWorked(driverDTO.getLastTimeWorked());
+        }
 
         driverService.update(updatedDriver);
         return ResponseEntity.ok(HttpStatus.OK);

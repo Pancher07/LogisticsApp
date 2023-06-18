@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +28,9 @@ public class Driver {
 
     @Column(name = "phone", nullable = false)
     private String phone;
+
+    @Column(name = "last_time_worked")
+    private LocalDateTime lastTimeWorked;
 
     @OneToOne
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")

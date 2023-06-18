@@ -2,6 +2,8 @@ package com.panchenko.LogisticsApp.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class DriverDTO {
 
@@ -12,4 +14,6 @@ public class DriverDTO {
     private String surname;
 
     private String phone;
+
+    private LocalDateTime lastTimeWorked;
 }

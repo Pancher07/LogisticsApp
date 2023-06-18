@@ -32,7 +32,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public Trailer readById(long id) {
         return trailerRepository.findById(id).orElseThrow(
-                () -> new TrailerNotFoundException("Truck tractor with id " + id + " not found"));
+                () -> new TrailerNotFoundException("Trailer with id " + id + " not found"));
     }
 
     @Override

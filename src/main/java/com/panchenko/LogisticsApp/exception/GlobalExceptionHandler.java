@@ -4,6 +4,10 @@ import com.panchenko.LogisticsApp.exception.DriverException.DriverErrorResponse;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotFoundException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.ProjectException.ProjectErrorResponse;
+import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotCreatedException;
+import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotFoundException;
+import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotUpdatedException;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerErrorResponse;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotCreatedException;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotFoundException;
@@ -16,7 +20,6 @@ import com.panchenko.LogisticsApp.exception.UserException.UserErrorResponse;
 import com.panchenko.LogisticsApp.exception.UserException.UserNotCreatedException;
 import com.panchenko.LogisticsApp.exception.UserException.UserNotFoundException;
 import com.panchenko.LogisticsApp.exception.UserException.UserNotUpdatedException;
-import com.panchenko.LogisticsApp.model.TruckTractor;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +45,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+    //For User
+
     @ExceptionHandler
     public ResponseEntity<UserErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
         UserErrorResponse response = new UserErrorResponse(ex.getMessage());
@@ -59,6 +64,8 @@ public class GlobalExceptionHandler {
         UserErrorResponse response = new UserErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    //For Driver
 
     @ExceptionHandler
     public ResponseEntity<DriverErrorResponse> handleDriverNotFoundException(DriverNotFoundException ex) {
@@ -78,6 +85,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    //For Truck Tractor
+
     @ExceptionHandler
     public ResponseEntity<TruckTractorErrorResponse> handleTruckTractorNotFoundException(TruckTractorNotFoundException ex) {
         TruckTractorErrorResponse response = new TruckTractorErrorResponse(ex.getMessage());
@@ -96,6 +105,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    //For Trailer
+
     @ExceptionHandler
     public ResponseEntity<TrailerErrorResponse> handleTrailerNotFoundException(TrailerNotFoundException ex) {
         TrailerErrorResponse response = new TrailerErrorResponse(ex.getMessage());
@@ -111,6 +122,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<TrailerErrorResponse> handleTrailerNotUpdatedException(TrailerNotUpdatedException ex) {
         TrailerErrorResponse response = new TrailerErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    //For Project
+
+    @ExceptionHandler
+    public ResponseEntity<ProjectErrorResponse> handleProjectNotFoundException(ProjectNotFoundException ex) {
+        ProjectErrorResponse response = new ProjectErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProjectErrorResponse> handleProjectNotCreatedException(ProjectNotCreatedException ex) {
+        ProjectErrorResponse response = new ProjectErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ProjectErrorResponse> handleProjectNotUpdatedException(ProjectNotUpdatedException ex) {
+        ProjectErrorResponse response = new ProjectErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
