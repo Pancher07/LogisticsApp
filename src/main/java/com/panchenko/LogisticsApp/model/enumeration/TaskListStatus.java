@@ -1,5 +1,5 @@
 package com.panchenko.LogisticsApp.model.enumeration;
 
-public enum TasksListStatus {
+public enum TaskListStatus {
     OPENED, IN_WORK, CLOSED
 }

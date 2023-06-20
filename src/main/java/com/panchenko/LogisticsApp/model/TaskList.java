@@ -1,6 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enumeration.TasksListStatus;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,14 +13,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tasks_lists")
-public class TasksList {
+@Table(name = "task_lists")
+public class TaskList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "status")
-    private TasksListStatus status;
+    private TaskListStatus status;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -29,9 +29,9 @@ public class TasksList {
     @JoinColumn(name = "logistician_id", referencedColumnName = "id")
     private Logistician logistician;
 
-    @OneToMany(mappedBy = "tasksList")
+    @OneToMany(mappedBy = "taskList")
     private List<LoadingOrder> loadingOrders;
 
-    @OneToMany(mappedBy = "tasksList")
+    @OneToMany(mappedBy = "taskList")
     private List<ManagerOrder> managerOrders;
 }

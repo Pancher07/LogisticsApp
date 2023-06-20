@@ -2,10 +2,8 @@ package com.panchenko.LogisticsApp.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class Logistician {
     private List<Hitch> hitches;
 
     @OneToMany(mappedBy = "logistician")
-    private List<TasksList> tasksLists;
+    private List<TaskList> taskLists;
 
     public Logistician(User user) {
         this.user = user;

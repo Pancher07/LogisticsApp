@@ -38,8 +38,8 @@ public class LoadingOrder {
     private OrderStatus orderStatus;
 
     @ManyToOne
-    @JoinColumn(name = "tasks_list_id", referencedColumnName = "id")
-    private TasksList tasksList;
+    @JoinColumn(name = "task_list_id", referencedColumnName = "id")
+    private TaskList taskList;
 
     @ManyToMany
     @JoinTable(

@@ -52,8 +52,8 @@ public class ManagerOrder {
     private Manager manager;
 
     @ManyToOne
-    @JoinColumn(name = "tasks_list_id", referencedColumnName = "id")
-    private TasksList tasksList;
+    @JoinColumn(name = "task_list_id", referencedColumnName = "id")
+    private TaskList taskList;
 
     @OneToOne
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")

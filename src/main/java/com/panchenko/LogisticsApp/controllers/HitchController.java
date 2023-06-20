@@ -1,6 +1,5 @@
 package com.panchenko.LogisticsApp.controllers;
 
-import com.panchenko.LogisticsApp.dto.ContractorResponse;
 import com.panchenko.LogisticsApp.dto.HitchDTO;
 import com.panchenko.LogisticsApp.dto.HitchResponse;
 import com.panchenko.LogisticsApp.exception.HitchException.HitchNotCreatedException;
