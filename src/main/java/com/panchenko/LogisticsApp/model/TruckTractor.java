@@ -25,8 +25,6 @@ public class TruckTractor {
     @Column(name = "pump", nullable = false)
     private PresenceOfPumpOrCalibration pump;
 
-    @OneToOne
-    @JoinColumn(name = "hitch_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "truckTractor")
     private Hitch hitch;
-
 }

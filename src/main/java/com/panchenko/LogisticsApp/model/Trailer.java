@@ -32,7 +32,6 @@ public class Trailer {
     @Column(name = "petroleum_type", nullable = false)
     private PetroleumType petroleumType;
 
-    @OneToOne
-    @JoinColumn(name = "hitch_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "trailer")
     private Hitch hitch;
 }

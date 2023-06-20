@@ -19,7 +19,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "project_type", nullable = false)
+    @Column(name = "petroleum_type", nullable = false)
     private PetroleumType petroleumType;
 
     @Column(name = "project_country", nullable = false)

@@ -41,6 +41,10 @@ public class LoadingOrder {
     @JoinColumn(name = "tasks_list_id", referencedColumnName = "id")
     private TasksList tasksList;
 
-    @OneToMany(mappedBy = "loadingOrder")
+    @ManyToMany
+    @JoinTable(
+            name = "loading_orders_hitches",
+            joinColumns = @JoinColumn(name = "loading_order_id"),
+            inverseJoinColumns = @JoinColumn(name = "hitch_id"))
     private List<Hitch> hitches;
 }

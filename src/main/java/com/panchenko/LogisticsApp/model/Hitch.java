@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,13 +27,16 @@ public class Hitch {
     @Column(name = "vehicle_status", nullable = false)
     private VehicleStatus vehicleStatus;
 
-    @OneToOne(mappedBy = "hitch")
+    @OneToOne
+    @JoinColumn(name = "truckTractor_id", referencedColumnName = "id", nullable = false)
     private TruckTractor truckTractor;
 
-    @OneToOne(mappedBy = "hitch")
+    @OneToOne
+    @JoinColumn(name = "trailer_id", referencedColumnName = "id")
     private Trailer trailer;
 
-    @OneToOne(mappedBy = "hitch")
+    @OneToOne
+    @JoinColumn(name = "driver_id", referencedColumnName = "id")
     private Driver driver;
 
     @ManyToOne
@@ -45,7 +50,6 @@ public class Hitch {
     @OneToOne(mappedBy = "hitch")
     private ManagerOrder managerOrder;
 
-    @ManyToOne
-    @JoinColumn(name = "loading_order_id", referencedColumnName = "id")
-    private LoadingOrder loadingOrder;
+    @ManyToMany(mappedBy = "hitches")
+    private List<LoadingOrder> loadingOrders;
 }

@@ -32,7 +32,6 @@ public class Driver {
     @Column(name = "last_time_worked")
     private LocalDateTime lastTimeWorked;
 
-    @OneToOne
-    @JoinColumn(name = "hitch_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "driver")
     private Hitch hitch;
 }

@@ -12,7 +12,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,15 +27,25 @@ public class DriverController {
     }
 
     @GetMapping
-    public List<DriverDTO> getAll() {
-        return driverService.getAll().stream()
+    public ResponseEntity<?> getAll() {
+        List<DriverDTO> driverDTOList = driverService.getAll().stream()
                 .map(this.driverService::convertToDriverDTO)
                 .collect(Collectors.toList());
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/drivers");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", driverDTOList);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public DriverDTO getById(@PathVariable long id) {
-        return driverService.convertToDriverDTO(driverService.readById(id));
+    public ResponseEntity<?> getById(@PathVariable long id) {
+        DriverDTO driverDTO = driverService.convertToDriverDTO(driverService.readById(id));
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/drivers/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", driverDTO);
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping

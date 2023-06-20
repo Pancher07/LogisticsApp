@@ -1,5 +1,9 @@
 package com.panchenko.LogisticsApp.exception;
 
+import com.panchenko.LogisticsApp.exception.ContractorException.ContractorErrorResponse;
+import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotCreatedException;
+import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotFoundException;
+import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotUpdatedException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverErrorResponse;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotFoundException;
@@ -142,6 +146,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ProjectErrorResponse> handleProjectNotUpdatedException(ProjectNotUpdatedException ex) {
         ProjectErrorResponse response = new ProjectErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    //For Contractor
+
+    @ExceptionHandler
+    public ResponseEntity<ContractorErrorResponse> handleContractorNotFoundException(ContractorNotFoundException ex) {
+        ContractorErrorResponse response = new ContractorErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ContractorErrorResponse> handleContractorNotCreatedException(ContractorNotCreatedException ex) {
+        ContractorErrorResponse response = new ContractorErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ContractorErrorResponse> handleContractorNotUpdatedException(ContractorNotUpdatedException ex) {
+        ContractorErrorResponse response = new ContractorErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
