@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
 import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
+import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
 import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,22 +27,22 @@ public class ManagerOrder {
     private double volume;
 
     @Column(name = "pump", nullable = false)
-    private boolean pump;
+    private PresenceOfPumpOrCalibration pump;
 
     @Column(name = "calibration", nullable = false)
-    private boolean calibration;
+    private PresenceOfPumpOrCalibration calibration;
 
     @Column(name = "contact", nullable = false)
     private String contact;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 
     @Column(name = "uploading_date_time", nullable = false)
     private LocalDateTime uploadingDateTime;
 
     @Column(name = "status", nullable = false)
     private OrderStatus orderStatus;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "contractor_id", referencedColumnName = "id")

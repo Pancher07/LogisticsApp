@@ -8,10 +8,26 @@ import com.panchenko.LogisticsApp.exception.DriverException.DriverErrorResponse;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotFoundException;
 import com.panchenko.LogisticsApp.exception.DriverException.DriverNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.HitchException.HitchErrorResponse;
+import com.panchenko.LogisticsApp.exception.HitchException.HitchNotCreatedException;
+import com.panchenko.LogisticsApp.exception.HitchException.HitchNotFoundException;
+import com.panchenko.LogisticsApp.exception.HitchException.HitchNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderErrorResponse;
+import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotCreatedException;
+import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotFoundException;
+import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.ManagerOrderException.ManagerOrderErrorResponse;
+import com.panchenko.LogisticsApp.exception.ManagerOrderException.ManagerOrderNotCreatedException;
+import com.panchenko.LogisticsApp.exception.ManagerOrderException.ManagerOrderNotFoundException;
+import com.panchenko.LogisticsApp.exception.ManagerOrderException.ManagerOrderNotUpdatedException;
 import com.panchenko.LogisticsApp.exception.ProjectException.ProjectErrorResponse;
 import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotCreatedException;
 import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotFoundException;
 import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListErrorResponse;
+import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotCreatedException;
+import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotFoundException;
+import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotUpdatedException;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerErrorResponse;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotCreatedException;
 import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotFoundException;
@@ -166,6 +182,85 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ContractorErrorResponse> handleContractorNotUpdatedException(ContractorNotUpdatedException ex) {
         ContractorErrorResponse response = new ContractorErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    //For Hitch
+
+    @ExceptionHandler
+    public ResponseEntity<HitchErrorResponse> handleHitchNotFoundException(HitchNotFoundException ex) {
+        HitchErrorResponse response = new HitchErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<HitchErrorResponse> handleHitchNotCreatedException(HitchNotCreatedException ex) {
+        HitchErrorResponse response = new HitchErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<HitchErrorResponse> handleHitchNotUpdatedException(HitchNotUpdatedException ex) {
+        HitchErrorResponse response = new HitchErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    //For Loading Order
+
+    @ExceptionHandler
+    public ResponseEntity<LoadingOrderErrorResponse> handleLoadingOrderNotFoundException(LoadingOrderNotFoundException ex) {
+        LoadingOrderErrorResponse response = new LoadingOrderErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<LoadingOrderErrorResponse> handleLoadingOrderNotCreatedException(LoadingOrderNotCreatedException ex) {
+        LoadingOrderErrorResponse response = new LoadingOrderErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<LoadingOrderErrorResponse> handleLoadingOrderNotUpdatedException(LoadingOrderNotUpdatedException ex) {
+        LoadingOrderErrorResponse response = new LoadingOrderErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    //For Task List
+
+    @ExceptionHandler
+    public ResponseEntity<TaskListErrorResponse> handleTaskListNotFoundException(TaskListNotFoundException ex) {
+        TaskListErrorResponse response = new TaskListErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<TaskListErrorResponse> handleTaskListNotCreatedException(TaskListNotCreatedException ex) {
+        TaskListErrorResponse response = new TaskListErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<TaskListErrorResponse> handleTaskListNotUpdatedException(TaskListNotUpdatedException ex) {
+        TaskListErrorResponse response = new TaskListErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    //For Manager Order
+
+    @ExceptionHandler
+    public ResponseEntity<ManagerOrderErrorResponse> handleManagerOrderNotFoundException(ManagerOrderNotFoundException ex) {
+        ManagerOrderErrorResponse response = new ManagerOrderErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ManagerOrderErrorResponse> handleManagerOrderNotCreatedException(ManagerOrderNotCreatedException ex) {
+        ManagerOrderErrorResponse response = new ManagerOrderErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ManagerOrderErrorResponse> handleLoadingOrderNotUpdatedException(ManagerOrderNotUpdatedException ex) {
+        ManagerOrderErrorResponse response = new ManagerOrderErrorResponse(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

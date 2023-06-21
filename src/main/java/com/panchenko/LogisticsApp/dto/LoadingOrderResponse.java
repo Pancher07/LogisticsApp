@@ -22,7 +22,7 @@ public class LoadingOrderResponse {
 
     OrderStatus orderStatus;
 
-    long tasksListId;
+    long taskListId;
 
     public LoadingOrderResponse(LoadingOrder loadingOrder) {
         loadingPoint = loadingOrder.getLoadingPoint();
@@ -31,9 +31,9 @@ public class LoadingOrderResponse {
         loadingDateTime = loadingOrder.getLoadingDateTime();
         orderStatus = loadingOrder.getOrderStatus();
         if (loadingOrder.getTaskList() != null) {
-            tasksListId = loadingOrder.getTaskList().getId();
+            taskListId = loadingOrder.getTaskList().getId();
         } else {
-            tasksListId = 0;
+            taskListId = 0;
         }
     }
 }
