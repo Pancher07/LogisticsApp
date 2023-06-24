@@ -1,11 +1,10 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.HitchDTO;
-import com.panchenko.LogisticsApp.dto.HitchResponse;
-import com.panchenko.LogisticsApp.exception.HitchException.HitchNotCreatedException;
-import com.panchenko.LogisticsApp.exception.HitchException.HitchNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Hitch;
-import com.panchenko.LogisticsApp.service.HitchService;
+import com.panchenko.LogisticsApp.service.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,30 +20,42 @@ import java.util.Map;
 @RequestMapping("/api/hitches")
 public class HitchController {
     private final HitchService hitchService;
+    private final TrailerService trailerService;
+    private final DriverService driverService;
+    private final ProjectService projectService;
+    private final LogisticianService logisticianService;
+    private final TruckTractorService truckTractorService;
 
-    public HitchController(HitchService hitchService) {
+    public HitchController(HitchService hitchService, TrailerService trailerService, DriverService driverService,
+                           ProjectService projectService, LogisticianService logisticianService,
+                           TruckTractorService truckTractorService) {
         this.hitchService = hitchService;
+        this.trailerService = trailerService;
+        this.driverService = driverService;
+        this.projectService = projectService;
+        this.logisticianService = logisticianService;
+        this.truckTractorService = truckTractorService;
     }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        List<HitchResponse> hitchResponseList = hitchService.getAll().stream()
-                .map(HitchResponse::new).toList();
+        List<HitchDTO> hitchDTOList = hitchService.getAll().stream()
+                .map(hitchService::convertToHitchDTO).toList();
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/hitches");
         map.put("status code", HttpStatus.OK);
-        map.put("body", hitchResponseList);
+        map.put("body", hitchDTOList);
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
-        HitchResponse hitchResponse = new HitchResponse(hitchService.readById(id));
+        HitchDTO hitchDTO = hitchService.convertToHitchDTO(hitchService.readById(id));
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/hitches/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", hitchResponse);
+        map.put("body", hitchDTO);
         return ResponseEntity.ok(map);
     }
 
@@ -59,16 +70,16 @@ public class HitchController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new HitchNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         Hitch hitch = hitchService.create(hitchService.convertToHitch(hitchDTO));
 
-        HitchResponse hitchResponse = new HitchResponse(hitch);
+        HitchDTO hitchDTOResponse = hitchService.convertToHitchDTO(hitch);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/hitches");
         map.put("status code", HttpStatus.CREATED);
-        map.put("body", hitchResponse);
+        map.put("body", hitchDTOResponse);
         return ResponseEntity.ok(map);
     }
 
@@ -83,7 +94,7 @@ public class HitchController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new HitchNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         Hitch updatedHitch = hitchService.readById(id);
 
@@ -96,30 +107,30 @@ public class HitchController {
         if (hitchDTO.getVehicleStatus() != null) {
             updatedHitch.setVehicleStatus(hitchDTO.getVehicleStatus());
         }
-        if (hitchDTO.getTruckTractor() != null) {
-            updatedHitch.setTruckTractor(hitchDTO.getTruckTractor());
+        if (hitchDTO.getTruckTractorId() != null) {
+            updatedHitch.setTruckTractor(truckTractorService.readById(hitchDTO.getTruckTractorId()));
         }
-        if (hitchDTO.getTrailer() != null) {
-            updatedHitch.setTrailer(hitchDTO.getTrailer());
+        if (hitchDTO.getTrailerId() != null) {
+            updatedHitch.setTrailer(trailerService.readById(hitchDTO.getTrailerId()));
         }
-        if (hitchDTO.getDriver() != null) {
-            updatedHitch.setDriver(hitchDTO.getDriver());
+        if (hitchDTO.getDriverId() != null) {
+            updatedHitch.setDriver(driverService.readById(hitchDTO.getDriverId()));
         }
-        if (hitchDTO.getProject() != null) {
-            updatedHitch.setProject(hitchDTO.getProject());
+        if (hitchDTO.getProjectId() != null) {
+            updatedHitch.setProject(projectService.readById(hitchDTO.getProjectId()));
         }
-        if (hitchDTO.getLogistician() != null) {
-            updatedHitch.setLogistician(hitchDTO.getLogistician());
+        if (hitchDTO.getLogisticianId() != null) {
+            updatedHitch.setLogistician(logisticianService.readById(hitchDTO.getLogisticianId()));
         }
 
         hitchService.update(updatedHitch);
 
-        HitchResponse hitchResponse = new HitchResponse(updatedHitch);
+        HitchDTO hitchDTOResponse = hitchService.convertToHitchDTO(updatedHitch);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/hitches/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", hitchResponse);
+        map.put("body", hitchDTOResponse);
         return ResponseEntity.ok(map);
     }
 

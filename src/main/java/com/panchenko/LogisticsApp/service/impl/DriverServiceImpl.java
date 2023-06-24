@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.DriverDTO;
-import com.panchenko.LogisticsApp.exception.DriverException.DriverNotFoundException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Driver;
 import com.panchenko.LogisticsApp.repository.DriverRepository;
 import com.panchenko.LogisticsApp.service.DriverService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +32,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver readById(long id) {
         return driverRepository.findById(id).orElseThrow(
-                () -> new DriverNotFoundException("Driver with id " + id + " not found"));
+                () -> new EntityNotFoundException("Driver with id " + id + " not found"));
     }
 
     @Override
-    public Driver update(Driver driver) {
+    public Driver update(Driver driver) {               //DTO
         if (driver == null) {
             throw new NullEntityReferenceException("Driver cannot be 'null'");
         }

@@ -2,10 +2,10 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotFoundException;
 import com.panchenko.LogisticsApp.model.Trailer;
 import com.panchenko.LogisticsApp.repository.TrailerRepository;
 import com.panchenko.LogisticsApp.service.TrailerService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class TrailerServiceImpl implements TrailerService {
     @Override
     public Trailer readById(long id) {
         return trailerRepository.findById(id).orElseThrow(
-                () -> new TrailerNotFoundException("Trailer with id " + id + " not found"));
+                () -> new EntityNotFoundException("Trailer with id " + id + " not found"));
     }
 
     @Override

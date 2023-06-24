@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.HitchDTO;
-import com.panchenko.LogisticsApp.exception.HitchException.HitchNotFoundException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.repository.HitchRepository;
 import com.panchenko.LogisticsApp.service.HitchService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,7 @@ public class HitchServiceImpl implements HitchService {
     public HitchServiceImpl(HitchRepository hitchRepository, ModelMapper modelMapper) {
         this.hitchRepository = hitchRepository;
         this.modelMapper = modelMapper;
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class HitchServiceImpl implements HitchService {
     @Override
     public Hitch readById(long id) {
         return hitchRepository.findById(id).orElseThrow(
-                () -> new HitchNotFoundException("Hitch with id " + id + " not found"));
+                () -> new EntityNotFoundException("Hitch with id " + id + " not found"));
     }
 
     @Override

@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.ContractorDTO;
-import com.panchenko.LogisticsApp.dto.ContractorResponse;
-import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotCreatedException;
-import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Contractor;
 import com.panchenko.LogisticsApp.service.ContractorService;
+import com.panchenko.LogisticsApp.service.ManagerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,36 +16,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/contractors")
 public class ContractorController {
     private final ContractorService contractorService;
+    private final ManagerService managerService;
 
-    public ContractorController(ContractorService contractorService) {
+    public ContractorController(ContractorService contractorService, ManagerService managerService) {
         this.contractorService = contractorService;
+        this.managerService = managerService;
     }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        List<ContractorResponse> contractorResponseList = contractorService.getAll().stream()
-                .map(ContractorResponse::new)
-                .collect(Collectors.toList());
+        List<ContractorDTO> contractorDTOList = contractorService.getAll().stream()
+                .map(this.contractorService::convertToContractorDTO).toList();
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/contractors");
         map.put("status code", HttpStatus.OK);
-        map.put("body", contractorResponseList);
+        map.put("body", contractorDTOList);
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
-        ContractorResponse contractorResponse = new ContractorResponse(contractorService.readById(id));
+        ContractorDTO contractorDTO = contractorService.convertToContractorDTO(contractorService.readById(id));
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/contractors/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", contractorResponse);
+        map.put("body", contractorDTO);
         return ResponseEntity.ok(map);
     }
 
@@ -60,16 +60,17 @@ public class ContractorController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new ContractorNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         Contractor contractor = contractorService.create(contractorService.convertToContractor(contractorDTO));
-        ContractorResponse contractorResponse = new ContractorResponse(contractor);
+
+        ContractorDTO contractorDTOResponse = contractorService.convertToContractorDTO(contractor);
 
         Map<String, Object> map = new HashMap<>();
 
         map.put("status code", HttpStatus.CREATED);
         map.put("header", "URL: /api/contractors/");
-        map.put("body", contractorResponse);
+        map.put("body", contractorDTOResponse);
         return ResponseEntity.ok(map);
     }
 
@@ -84,25 +85,25 @@ public class ContractorController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new ContractorNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         Contractor updatedContractor = contractorService.readById(id);
 
         if (contractorDTO.getName() != null) {
             updatedContractor.setName(contractorDTO.getName());
         }
-        if (contractorDTO.getManager() != null) {
-            updatedContractor.setManager(contractorDTO.getManager());
+        if (contractorDTO.getManagerId() != null) {
+            updatedContractor.setManager(managerService.readById(contractorDTO.getManagerId()));
         }
 
         contractorService.update(updatedContractor);
 
-        ContractorResponse contractorResponse = new ContractorResponse(updatedContractor);
+        ContractorDTO contractorDTOResponse = contractorService.convertToContractorDTO(updatedContractor);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/contractors/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", contractorResponse);
+        map.put("body", contractorDTOResponse);
 
         return ResponseEntity.ok(map);
     }

@@ -1,10 +1,10 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TaskListDTO;
-import com.panchenko.LogisticsApp.dto.TaskListResponse;
-import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotCreatedException;
-import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.TaskList;
+import com.panchenko.LogisticsApp.service.LogisticianService;
 import com.panchenko.LogisticsApp.service.TaskListService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,30 +21,32 @@ import java.util.Map;
 @RequestMapping("/api/task-lists")
 public class TaskListController {
     private final TaskListService taskListService;
+    private final LogisticianService logisticianService;
 
-    public TaskListController(TaskListService taskListService) {
+    public TaskListController(TaskListService taskListService, LogisticianService logisticianService) {
         this.taskListService = taskListService;
+        this.logisticianService = logisticianService;
     }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        List<TaskListResponse> taskListResponseList = taskListService.getAll().stream()
-                .map(TaskListResponse::new).toList();
+        List<TaskListDTO> taskListDTOList = taskListService.getAll().stream()
+                .map(taskListService::convertToTaskListDTO).toList();
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/task-list");
         map.put("status code", HttpStatus.OK);
-        map.put("body", taskListResponseList);
+        map.put("body", taskListDTOList);
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
-        TaskListResponse taskListResponse = new TaskListResponse(taskListService.readById(id));
+        TaskListDTO taskListDTO = taskListService.convertToTaskListDTO(taskListService.readById(id));
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/task-list/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", taskListResponse);
+        map.put("body", taskListDTO);
         return ResponseEntity.ok(map);
     }
 
@@ -59,16 +61,16 @@ public class TaskListController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TaskListNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         TaskList taskList = taskListService.create(taskListService.convertToTaskList(taskListDTO));
 
-        TaskListResponse taskListResponse = new TaskListResponse(taskList);
+        TaskListDTO taskListDTOResponse = taskListService.convertToTaskListDTO(taskList);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/task-list");
         map.put("status code", HttpStatus.CREATED);
-        map.put("body", taskListResponse);
+        map.put("body", taskListDTOResponse);
         return ResponseEntity.ok(map);
     }
 
@@ -83,25 +85,25 @@ public class TaskListController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TaskListNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         TaskList updatedTaskList = taskListService.readById(id);
 
         if (taskListDTO.getStatus() != null) {
             updatedTaskList.setStatus(taskListDTO.getStatus());
         }
-        if (taskListDTO.getLogistician() != null) {
-            updatedTaskList.setLogistician(taskListDTO.getLogistician());
+        if (taskListDTO.getLogisticianId() != null) {
+            updatedTaskList.setLogistician(logisticianService.readById(taskListDTO.getLogisticianId()));
         }
 
         taskListService.update(updatedTaskList);
 
-        TaskListResponse taskListResponse = new TaskListResponse(updatedTaskList);
+        TaskListDTO taskListDTOResponse = taskListService.convertToTaskListDTO(updatedTaskList);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/task-list/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", taskListResponse);
+        map.put("body", taskListDTOResponse);
         return ResponseEntity.ok(map);
     }
 

@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
-import com.panchenko.LogisticsApp.exception.ManagerOrderException.ManagerOrderNotFoundException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
 import com.panchenko.LogisticsApp.service.ManagerOrderService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +21,8 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     public ManagerOrderServiceImpl(ManagerOrderRepository managerOrderRepository, ModelMapper modelMapper) {
         this.managerOrderRepository = managerOrderRepository;
         this.modelMapper = modelMapper;
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
     }
-
 
     @Override
     public ManagerOrder create(ManagerOrder managerOrder) {
@@ -36,7 +36,7 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     @Override
     public ManagerOrder readById(long id) {
         return managerOrderRepository.findById(id).orElseThrow(
-                () -> new ManagerOrderNotFoundException("Manager order with id " + id + " not found"));
+                () -> new EntityNotFoundException("Manager order with id " + id + " not found"));
     }
 
     @Override

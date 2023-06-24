@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.LoadingOrderDTO;
-import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotFoundException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.LoadingOrder;
 import com.panchenko.LogisticsApp.repository.LoadingOrderRepository;
 import com.panchenko.LogisticsApp.service.LoadingOrderService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class LoadingOrderServiceImpl implements LoadingOrderService {
     @Override
     public LoadingOrder readById(long id) {
         return loadingOrderRepository.findById(id).orElseThrow(
-                () -> new LoadingOrderNotFoundException("Loading order with id " + id + " not found"));
+                () -> new EntityNotFoundException("Loading order with id " + id + " not found"));
     }
 
     @Override

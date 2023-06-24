@@ -1,8 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.ProjectDTO;
-import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotCreatedException;
-import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Project;
 import com.panchenko.LogisticsApp.service.ProjectService;
 import jakarta.validation.Valid;
@@ -47,7 +47,7 @@ public class ProjectController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new ProjectNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         projectService.create(projectService.convertToProject(projectDTO));
 
@@ -65,7 +65,7 @@ public class ProjectController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new ProjectNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         Project updatedProject = projectService.readById(id);
 

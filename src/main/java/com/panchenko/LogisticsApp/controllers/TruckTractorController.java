@@ -1,9 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TruckTractorDTO;
-import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
-import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorNotCreatedException;
-import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.TruckTractor;
 import com.panchenko.LogisticsApp.service.TruckTractorService;
 import jakarta.validation.Valid;
@@ -48,7 +47,7 @@ public class TruckTractorController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TruckTractorNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         truckTractorService.create(truckTractorService.convertToTruckTractor(truckTractorDTO));
 
@@ -66,7 +65,7 @@ public class TruckTractorController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TruckTractorNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         TruckTractor updatedTruckTractor = truckTractorService.readById(id);
 

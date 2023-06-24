@@ -1,8 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.DriverDTO;
-import com.panchenko.LogisticsApp.exception.DriverException.DriverNotCreatedException;
-import com.panchenko.LogisticsApp.exception.DriverException.DriverNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Driver;
 import com.panchenko.LogisticsApp.service.DriverService;
 import jakarta.validation.Valid;
@@ -58,7 +58,7 @@ public class DriverController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new DriverNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         driverService.create(driverService.convertToDriver(driverDTO));
 
@@ -76,7 +76,7 @@ public class DriverController {
                         .append("-").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new DriverNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         Driver updatedDriver = driverService.readById(id);
 

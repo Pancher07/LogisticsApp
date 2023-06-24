@@ -2,7 +2,6 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.UserDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.UserException.UserNotFoundException;
 import com.panchenko.LogisticsApp.model.Logistician;
 import com.panchenko.LogisticsApp.model.Manager;
 import com.panchenko.LogisticsApp.model.User;
@@ -10,6 +9,7 @@ import com.panchenko.LogisticsApp.repository.LogisticianRepository;
 import com.panchenko.LogisticsApp.repository.ManagerRepository;
 import com.panchenko.LogisticsApp.repository.UserRepository;
 import com.panchenko.LogisticsApp.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User readById(long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("User with id " + id + " not found"));
+                () -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
     @Override

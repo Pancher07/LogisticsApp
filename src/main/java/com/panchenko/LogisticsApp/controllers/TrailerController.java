@@ -1,8 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
-import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotCreatedException;
-import com.panchenko.LogisticsApp.exception.TrailerException.TrailerNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Trailer;
 import com.panchenko.LogisticsApp.service.TrailerService;
 import jakarta.validation.Valid;
@@ -47,7 +47,7 @@ public class TrailerController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TrailerNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         trailerService.create(trailerService.convertToTrailer(trailerDTO));
 
@@ -65,7 +65,7 @@ public class TrailerController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new TrailerNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         Trailer updatedTrailer = trailerService.readById(id);
 

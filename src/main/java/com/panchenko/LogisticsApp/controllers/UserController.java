@@ -1,8 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.UserDTO;
-import com.panchenko.LogisticsApp.exception.UserException.UserNotCreatedException;
-import com.panchenko.LogisticsApp.exception.UserException.UserNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.User;
 import com.panchenko.LogisticsApp.service.UserService;
 import jakarta.validation.Valid;
@@ -48,7 +48,7 @@ public class UserController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new UserNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         userService.create(userService.convertToUser(userDTO));
 
@@ -66,7 +66,7 @@ public class UserController {
                         .append("-").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new UserNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         User updatedUser = userService.readById(id);
 

@@ -2,10 +2,10 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.TruckTractorDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.TruckTractorException.TruckTractorNotFoundException;
 import com.panchenko.LogisticsApp.model.TruckTractor;
 import com.panchenko.LogisticsApp.repository.TruckTractorRepository;
 import com.panchenko.LogisticsApp.service.TruckTractorService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class TruckTractorServiceImpl implements TruckTractorService {
     @Override
     public TruckTractor readById(long id) {
         return truckTractorRepository.findById(id).orElseThrow(
-                () -> new TruckTractorNotFoundException("Truck tractor with id " + id + " not found"));
+                () -> new EntityNotFoundException("Truck tractor with id " + id + " not found"));
     }
 
     @Override

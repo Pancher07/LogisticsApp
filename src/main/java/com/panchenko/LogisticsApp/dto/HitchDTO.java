@@ -1,6 +1,5 @@
 package com.panchenko.LogisticsApp.dto;
 
-import com.panchenko.LogisticsApp.model.*;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 
 import lombok.Data;
@@ -13,13 +12,13 @@ public class HitchDTO {
 
     private VehicleStatus vehicleStatus;
 
-    private TruckTractor truckTractor;
+    private Long truckTractorId;
 
-    private Trailer trailer;
+    private Long trailerId;
 
-    private Driver driver;
+    private Long driverId;
 
-    private Project project;
+    private Long projectId;
 
-    private Logistician logistician;
+    private Long logisticianId;
 }

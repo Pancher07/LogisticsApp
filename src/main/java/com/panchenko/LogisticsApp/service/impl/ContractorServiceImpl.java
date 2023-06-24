@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ContractorDTO;
-import com.panchenko.LogisticsApp.exception.ContractorException.ContractorNotFoundException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Contractor;
 import com.panchenko.LogisticsApp.repository.ContractorRepository;
 import com.panchenko.LogisticsApp.service.ContractorService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class ContractorServiceImpl implements ContractorService {
     @Override
     public Contractor readById(long id) {
         return contractorRepository.findById(id).orElseThrow(
-                () -> new ContractorNotFoundException("Contractor with id " + id + " not found"));
+                () -> new EntityNotFoundException("Contractor with id " + id + " not found"));
     }
 
     @Override

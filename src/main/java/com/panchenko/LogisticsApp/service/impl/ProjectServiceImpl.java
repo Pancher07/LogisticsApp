@@ -2,10 +2,10 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ProjectDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.ProjectException.ProjectNotFoundException;
 import com.panchenko.LogisticsApp.model.Project;
 import com.panchenko.LogisticsApp.repository.ProjectRepository;
 import com.panchenko.LogisticsApp.service.ProjectService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project readById(long id) {
         return projectRepository.findById(id).orElseThrow(
-                () -> new ProjectNotFoundException("Project with id " + id + " not found"));
+                () -> new EntityNotFoundException("Project with id " + id + " not found"));
     }
 
     @Override

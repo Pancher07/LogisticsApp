@@ -1,9 +1,9 @@
-package com.panchenko.LogisticsApp.exception.UserException;
+package com.panchenko.LogisticsApp.exception;
 
-public class UserErrorResponse {
+public class ErrorResponse {
     private String message;
 
-    public UserErrorResponse(String message) {
+    public ErrorResponse(String message) {
         this.message = message;
     }
 

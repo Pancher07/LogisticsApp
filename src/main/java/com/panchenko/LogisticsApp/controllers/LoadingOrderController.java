@@ -1,11 +1,11 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.LoadingOrderDTO;
-import com.panchenko.LogisticsApp.dto.LoadingOrderResponse;
-import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotCreatedException;
-import com.panchenko.LogisticsApp.exception.LoadingOrderException.LoadingOrderNotUpdatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
+import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.LoadingOrder;
 import com.panchenko.LogisticsApp.service.LoadingOrderService;
+import com.panchenko.LogisticsApp.service.TaskListService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,30 +21,32 @@ import java.util.Map;
 @RequestMapping("/api/loading-orders")
 public class LoadingOrderController {
     private final LoadingOrderService loadingOrderService;
+    private final TaskListService taskListService;
 
-    public LoadingOrderController(LoadingOrderService loadingOrderService) {
+    public LoadingOrderController(LoadingOrderService loadingOrderService, TaskListService taskListService) {
         this.loadingOrderService = loadingOrderService;
+        this.taskListService = taskListService;
     }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        List<LoadingOrderResponse> loadingOrderResponseList = loadingOrderService.getAll().stream()
-                .map(LoadingOrderResponse::new).toList();
+        List<LoadingOrderDTO> loadingOrderDTOList = loadingOrderService.getAll().stream()
+                .map(loadingOrderService::convertToLoadingOrderDTO).toList();
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/loading-orders");
         map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderResponseList);
+        map.put("body", loadingOrderDTOList);
         return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
-        LoadingOrderResponse loadingOrderResponse = new LoadingOrderResponse(loadingOrderService.readById(id));
+        LoadingOrderDTO loadingOrderDTO = loadingOrderService.convertToLoadingOrderDTO(loadingOrderService.readById(id));
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/loading-orders/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderResponse);
+        map.put("body", loadingOrderDTO);
         return ResponseEntity.ok(map);
     }
 
@@ -59,16 +61,16 @@ public class LoadingOrderController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new LoadingOrderNotCreatedException(errorMessage.toString());
+            throw new EntityNotCreatedException(errorMessage.toString());
         }
         LoadingOrder loadingOrder = loadingOrderService.create(loadingOrderService.convertToLoadingOrder(loadingOrderDTO));
 
-        LoadingOrderResponse loadingOrderResponse = new LoadingOrderResponse(loadingOrder);
+        LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(loadingOrder);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/loading-orders");
         map.put("status code", HttpStatus.CREATED);
-        map.put("body", loadingOrderResponse);
+        map.put("body", loadingOrderDTOResponse);
         return ResponseEntity.ok(map);
     }
 
@@ -83,7 +85,7 @@ public class LoadingOrderController {
                         .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
-            throw new LoadingOrderNotUpdatedException(errorMessage.toString());
+            throw new EntityNotUpdatedException(errorMessage.toString());
         }
         LoadingOrder updatedLoadingOrder = loadingOrderService.readById(id);
 
@@ -102,18 +104,18 @@ public class LoadingOrderController {
         if (loadingOrderDTO.getOrderStatus() != null) {
             updatedLoadingOrder.setOrderStatus(loadingOrderDTO.getOrderStatus());
         }
-        if (loadingOrderDTO.getTaskList() != null) {
-            updatedLoadingOrder.setTaskList(loadingOrderDTO.getTaskList());
+        if (loadingOrderDTO.getTaskListId() != null) {
+            updatedLoadingOrder.setTaskList(taskListService.readById(loadingOrderDTO.getTaskListId()));
         }
 
         loadingOrderService.update(updatedLoadingOrder);
 
-        LoadingOrderResponse loadingOrderResponse = new LoadingOrderResponse(updatedLoadingOrder);
+        LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(updatedLoadingOrder);
 
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/loading-orders/" + id);
         map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderResponse);
+        map.put("body", loadingOrderDTOResponse);
         return ResponseEntity.ok(map);
     }
 

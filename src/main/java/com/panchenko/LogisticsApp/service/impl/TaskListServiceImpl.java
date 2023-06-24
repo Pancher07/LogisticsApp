@@ -2,10 +2,10 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.TaskListDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
-import com.panchenko.LogisticsApp.exception.TaskListExceptions.TaskListNotFoundException;
 import com.panchenko.LogisticsApp.model.TaskList;
 import com.panchenko.LogisticsApp.repository.TaskListRepository;
 import com.panchenko.LogisticsApp.service.TaskListService;
+import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class TaskListServiceImpl implements TaskListService {
     @Override
     public TaskList readById(long id) {
         return taskListRepository.findById(id).orElseThrow(
-                () -> new TaskListNotFoundException("Task list with id " + id + " not found"));
+                () -> new EntityNotFoundException("Task list with id " + id + " not found"));
     }
 
     @Override

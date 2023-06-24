@@ -1,6 +1,5 @@
 package com.panchenko.LogisticsApp.dto;
 
-import com.panchenko.LogisticsApp.model.TaskList;
 import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import lombok.Data;
@@ -19,5 +18,5 @@ public class LoadingOrderDTO {
 
     private OrderStatus orderStatus;
 
-    private TaskList taskList;
+    private Long taskListId;
 }
