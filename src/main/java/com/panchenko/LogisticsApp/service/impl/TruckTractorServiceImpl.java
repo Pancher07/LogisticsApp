@@ -36,12 +36,20 @@ public class TruckTractorServiceImpl implements TruckTractorService {
     }
 
     @Override
-    public TruckTractor update(TruckTractor truckTractor) {
-        if (truckTractor == null) {
+    public TruckTractor update(TruckTractor updatedTruckTractor, TruckTractorDTO truckTractorDTO) {
+        if (updatedTruckTractor == null) {
             throw new NullEntityReferenceException("Truck tractor cannot be 'null'");
         }
-        readById(truckTractor.getId());
-        return truckTractorRepository.save(truckTractor);
+        if (truckTractorDTO.getPlateNumber() != null) {
+            updatedTruckTractor.setPlateNumber(truckTractorDTO.getPlateNumber());
+        }
+        if (truckTractorDTO.getModel() != null) {
+            updatedTruckTractor.setModel(truckTractorDTO.getModel());
+        }
+        if (truckTractorDTO.getPump() != null) {
+            updatedTruckTractor.setPump(truckTractorDTO.getPump());
+        }
+        return truckTractorRepository.save(updatedTruckTractor);
     }
 
     @Override

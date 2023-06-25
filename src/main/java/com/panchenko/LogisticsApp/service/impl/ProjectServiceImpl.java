@@ -36,12 +36,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project update(Project project) {
-        if (project == null) {
+    public Project update(Project updatedProject, ProjectDTO projectDTO) {
+        if (updatedProject == null) {
             throw new NullEntityReferenceException("Project cannot be 'null'");
         }
-        readById(project.getId());
-        return projectRepository.save(project);
+        if (projectDTO.getPetroleumType() != null) {
+            updatedProject.setPetroleumType(projectDTO.getPetroleumType());
+        }
+        if (projectDTO.getProjectCountry() != null) {
+            updatedProject.setProjectCountry(projectDTO.getProjectCountry());
+        }
+        return projectRepository.save(updatedProject);
     }
 
     @Override

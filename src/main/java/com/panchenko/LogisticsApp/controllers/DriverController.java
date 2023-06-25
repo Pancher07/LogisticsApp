@@ -1,15 +1,13 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.DriverDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Driver;
 import com.panchenko.LogisticsApp.service.DriverService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -49,55 +47,35 @@ public class DriverController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid DriverDTO driverDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        driverService.create(driverService.convertToDriver(driverDTO));
+    public ResponseEntity<?> create(@RequestBody @Valid DriverDTO driverDTO, BindingResult bindingResult) {
+        CheckErrors.checkErrorsForCreate(bindingResult);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        Driver driver = driverService.create(driverService.convertToDriver(driverDTO));
+
+        DriverDTO driverDTOResponse = driverService.convertToDriverDTO(driver);
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/drivers");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", driverDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid DriverDTO driverDTO,
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid DriverDTO driverDTO,
                                              BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append("-").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         Driver updatedDriver = driverService.readById(id);
 
-        if (driverDTO.getName() != null) {
-            updatedDriver.setName(driverDTO.getName());
-        }
-        if (driverDTO.getMiddleName() != null) {
-            updatedDriver.setMiddleName(driverDTO.getMiddleName());
-        }
-        if (driverDTO.getSurname() != null) {
-            updatedDriver.setSurname(driverDTO.getSurname());
-        }
-        if (driverDTO.getPhone() != null) {
-            updatedDriver.setPhone(driverDTO.getPhone());
-        }
-        if (driverDTO.getLastTimeWorked() != null) {
-            updatedDriver.setLastTimeWorked(driverDTO.getLastTimeWorked());
-        }
+        driverService.update(updatedDriver, driverDTO);
 
-        driverService.update(updatedDriver);
-        return ResponseEntity.ok(HttpStatus.OK);
+        DriverDTO driverDTOResponse = driverService.convertToDriverDTO(updatedDriver);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/drivers/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", driverDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @DeleteMapping("/{id}")

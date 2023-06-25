@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.model;
 
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

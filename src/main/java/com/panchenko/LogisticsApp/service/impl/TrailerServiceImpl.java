@@ -36,12 +36,26 @@ public class TrailerServiceImpl implements TrailerService {
     }
 
     @Override
-    public Trailer update(Trailer trailer) {
-        if (trailer == null) {
+    public Trailer update(Trailer updatedTrailer, TrailerDTO trailerDTO) {
+        if (updatedTrailer == null) {
             throw new NullEntityReferenceException("Trailer cannot be 'null'");
         }
-        readById(trailer.getId());
-        return trailerRepository.save(trailer);
+        if (trailerDTO.getPlateNumber() != null) {
+            updatedTrailer.setPlateNumber(trailerDTO.getPlateNumber());
+        }
+        if (trailerDTO.getModel() != null) {
+            updatedTrailer.setModel(trailerDTO.getModel());
+        }
+        if (trailerDTO.getVolume() != 0.0) {
+            updatedTrailer.setVolume(trailerDTO.getVolume());
+        }
+        if (trailerDTO.getCalibration() != null) {
+            updatedTrailer.setCalibration(trailerDTO.getCalibration());
+        }
+        if (trailerDTO.getPetroleumType() != null) {
+            updatedTrailer.setPetroleumType(trailerDTO.getPetroleumType());
+        }
+        return trailerRepository.save(updatedTrailer);
     }
 
     @Override

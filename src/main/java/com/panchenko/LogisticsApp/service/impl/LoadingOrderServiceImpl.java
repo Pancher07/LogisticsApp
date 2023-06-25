@@ -5,6 +5,7 @@ import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.LoadingOrder;
 import com.panchenko.LogisticsApp.repository.LoadingOrderRepository;
 import com.panchenko.LogisticsApp.service.LoadingOrderService;
+import com.panchenko.LogisticsApp.service.TaskListService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,13 @@ import java.util.List;
 public class LoadingOrderServiceImpl implements LoadingOrderService {
     private final LoadingOrderRepository loadingOrderRepository;
     private final ModelMapper modelMapper;
+    private final TaskListService taskListService;
 
-    public LoadingOrderServiceImpl(LoadingOrderRepository loadingOrderRepository, ModelMapper modelMapper) {
+    public LoadingOrderServiceImpl(LoadingOrderRepository loadingOrderRepository, ModelMapper modelMapper,
+                                   TaskListService taskListService) {
         this.loadingOrderRepository = loadingOrderRepository;
         this.modelMapper = modelMapper;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -38,12 +42,29 @@ public class LoadingOrderServiceImpl implements LoadingOrderService {
     }
 
     @Override
-    public LoadingOrder update(LoadingOrder loadingOrder) {
-        if (loadingOrder == null) {
+    public LoadingOrder update(LoadingOrder updatedLoadingOrder, LoadingOrderDTO loadingOrderDTO) {
+        if (updatedLoadingOrder == null) {
             throw new NullEntityReferenceException("Loading order cannot be 'null'");
         }
-        readById(loadingOrder.getId());
-        return loadingOrderRepository.save(loadingOrder);
+        if (loadingOrderDTO.getLoadingPoint() != null) {
+            updatedLoadingOrder.setLoadingPoint(loadingOrderDTO.getLoadingPoint());
+        }
+        if (loadingOrderDTO.getPetroleumType() != null) {
+            updatedLoadingOrder.setPetroleumType(loadingOrderDTO.getPetroleumType());
+        }
+        if (loadingOrderDTO.getCountOfVehicle() != 0) {
+            updatedLoadingOrder.setCountOfVehicle(loadingOrderDTO.getCountOfVehicle());
+        }
+        if (loadingOrderDTO.getLoadingDateTime() != null) {
+            updatedLoadingOrder.setLoadingDateTime(loadingOrderDTO.getLoadingDateTime());
+        }
+        if (loadingOrderDTO.getOrderStatus() != null) {
+            updatedLoadingOrder.setOrderStatus(loadingOrderDTO.getOrderStatus());
+        }
+        if (loadingOrderDTO.getTaskListId() != null) {
+            updatedLoadingOrder.setTaskList(taskListService.readById(loadingOrderDTO.getTaskListId()));
+        }
+        return loadingOrderRepository.save(updatedLoadingOrder);
     }
 
     @Override

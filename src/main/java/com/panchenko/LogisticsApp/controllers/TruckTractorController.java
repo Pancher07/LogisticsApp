@@ -1,19 +1,18 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TruckTractorDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.TruckTractor;
 import com.panchenko.LogisticsApp.service.TruckTractorService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/truck-tractors")
@@ -25,61 +24,59 @@ public class TruckTractorController {
     }
 
     @GetMapping
-    public List<TruckTractorDTO> getAll() {
-        return truckTractorService.getAll().stream()
-                .map(this.truckTractorService::convertToTruckTractorDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<?> getAll() {
+        List<TruckTractorDTO> truckTractorDTOList = truckTractorService.getAll().stream()
+                .map(truckTractorService::convertToTruckTractorDTO).toList();
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/truck-tractors");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", truckTractorDTOList);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public TruckTractorDTO getById(@PathVariable long id) {
-        return truckTractorService.convertToTruckTractorDTO(truckTractorService.readById(id));
+    public ResponseEntity<?> getById(@PathVariable long id) {
+        TruckTractorDTO truckTractorDTO = truckTractorService.convertToTruckTractorDTO(truckTractorService.readById(id));
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/truck-tractors/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", truckTractorDTO);
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid TruckTractorDTO truckTractorDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        truckTractorService.create(truckTractorService.convertToTruckTractor(truckTractorDTO));
+    public ResponseEntity<?> create(@RequestBody @Valid TruckTractorDTO truckTractorDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForCreate(bindingResult);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        TruckTractor truckTractor = truckTractorService
+                .create(truckTractorService.convertToTruckTractor(truckTractorDTO));
+
+        TruckTractorDTO truckTractorDTOResponse = truckTractorService.convertToTruckTractorDTO(truckTractor);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/truck-tractors");
+        map.put("status code", HttpStatus.CREATED);
+        map.put("body", truckTractorDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid TruckTractorDTO truckTractorDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TruckTractorDTO truckTractorDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         TruckTractor updatedTruckTractor = truckTractorService.readById(id);
 
-        if (truckTractorDTO.getPlateNumber() != null) {
-            updatedTruckTractor.setPlateNumber(truckTractorDTO.getPlateNumber());
-        }
-        if (truckTractorDTO.getModel() != null) {
-            updatedTruckTractor.setModel(truckTractorDTO.getModel());
-        }
-        if (truckTractorDTO.getPump() != null) {
-            updatedTruckTractor.setPump(truckTractorDTO.getPump());
-        }
-        truckTractorService.update(updatedTruckTractor);
-        return ResponseEntity.ok(HttpStatus.OK);
+        truckTractorService.update(updatedTruckTractor, truckTractorDTO);
+
+        TruckTractorDTO truckTractorDTOResponse = truckTractorService.convertToTruckTractorDTO(updatedTruckTractor);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/truck-tractors/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", truckTractorDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @DeleteMapping("/{id}")

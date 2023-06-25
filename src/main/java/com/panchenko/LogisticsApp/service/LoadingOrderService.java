@@ -10,7 +10,7 @@ public interface LoadingOrderService {
 
     LoadingOrder readById(long id);
 
-    LoadingOrder update(LoadingOrder loadingOrder);
+    LoadingOrder update(LoadingOrder loadingOrder, LoadingOrderDTO loadingOrderDTO);
 
     void delete(long id);
 

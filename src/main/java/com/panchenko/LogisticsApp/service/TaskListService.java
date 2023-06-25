@@ -10,7 +10,7 @@ public interface TaskListService {
 
     TaskList readById(long id);
 
-    TaskList update(TaskList taskList);
+    TaskList update(TaskList taskList, TaskListDTO taskListDTO);
 
     void delete(long id);
 

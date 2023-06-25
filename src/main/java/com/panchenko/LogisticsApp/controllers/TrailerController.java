@@ -1,19 +1,18 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Trailer;
 import com.panchenko.LogisticsApp.service.TrailerService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/trailers")
@@ -25,67 +24,58 @@ public class TrailerController {
     }
 
     @GetMapping
-    public List<TrailerDTO> getAll() {
-        return trailerService.getAll().stream()
-                .map(this.trailerService::convertToTrailerDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<?> getAll() {
+        List<TrailerDTO> trailerDTOList = trailerService.getAll().stream()
+                .map(trailerService::convertToTrailerDTO).toList();
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/trailers");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", trailerDTOList);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public TrailerDTO getById(@PathVariable long id) {
-        return trailerService.convertToTrailerDTO(trailerService.readById(id));
+    public ResponseEntity<?> getById(@PathVariable long id) {
+        TrailerDTO trailerDTO = trailerService.convertToTrailerDTO(trailerService.readById(id));
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/trailers/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", trailerDTO);
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid TrailerDTO trailerDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        trailerService.create(trailerService.convertToTrailer(trailerDTO));
+    public ResponseEntity<?> create(@RequestBody @Valid TrailerDTO trailerDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForCreate(bindingResult);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        Trailer trailer = trailerService.create(trailerService.convertToTrailer(trailerDTO));
+
+        TrailerDTO trailerDTOResponse = trailerService.convertToTrailerDTO(trailer);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/trailers");
+        map.put("status code", HttpStatus.CREATED);
+        map.put("body", trailerDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid TrailerDTO trailerDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TrailerDTO trailerDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         Trailer updatedTrailer = trailerService.readById(id);
 
-        if (trailerDTO.getPlateNumber() != null) {
-            updatedTrailer.setPlateNumber(trailerDTO.getPlateNumber());
-        }
-        if (trailerDTO.getModel() != null) {
-            updatedTrailer.setModel(trailerDTO.getModel());
-        }
-        if (trailerDTO.getVolume() != 0.0) {
-            updatedTrailer.setVolume(trailerDTO.getVolume());
-        }
-        if (trailerDTO.getCalibration() != null) {
-            updatedTrailer.setCalibration(trailerDTO.getCalibration());
-        }
-        if (trailerDTO.getPetroleumType() != null) {
-            updatedTrailer.setPetroleumType(trailerDTO.getPetroleumType());
-        }
-        trailerService.update(updatedTrailer);
-        return ResponseEntity.ok(HttpStatus.OK);
+        trailerService.update(updatedTrailer, trailerDTO);
+
+        TrailerDTO trailerDTOResponse = trailerService.convertToTrailerDTO(updatedTrailer);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/trailers/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", trailerDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @DeleteMapping("/{id}")

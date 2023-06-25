@@ -3,6 +3,7 @@ package com.panchenko.LogisticsApp.model;
 import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ public class LoadingOrder {
     private Long id;
 
     @Column(name = "loading_point", nullable = false)
+    @Size(min = 2, max = 30, message = "поле не може бути пустим")
+    //@NotNull(message = "поле не може бути пустим")
     private String loadingPoint;
 
     @Column(name = "petroleum_type", nullable = false)
@@ -34,6 +37,7 @@ public class LoadingOrder {
 
     @Column(name = "loading_date_time", nullable = false)
     private LocalDateTime loadingDateTime;
+
     @Column(name = "status", nullable = false)
     private OrderStatus orderStatus;
 

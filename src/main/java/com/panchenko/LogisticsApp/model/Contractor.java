@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Contractor {
     private Long id;
 
     @Column(name = "name", nullable = false)
+    //@NotEmpty(message = "поле не може бути пустим")
     private String name;
 
     @ManyToOne

@@ -10,7 +10,7 @@ public interface ContractorService {
 
     Contractor readById(long id);
 
-    Contractor update(Contractor contractor);
+    Contractor update(Contractor contractor, ContractorDTO contractorDTO);
 
     void delete(long id);
 

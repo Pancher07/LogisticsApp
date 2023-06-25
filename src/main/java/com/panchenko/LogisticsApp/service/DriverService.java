@@ -12,7 +12,7 @@ public interface DriverService {
 
     Driver readById(long id);
 
-    Driver update(Driver driver);
+    Driver update(Driver driver, DriverDTO driverDTO);
 
     void delete(long id);
 

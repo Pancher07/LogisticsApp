@@ -5,6 +5,7 @@ import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Contractor;
 import com.panchenko.LogisticsApp.repository.ContractorRepository;
 import com.panchenko.LogisticsApp.service.ContractorService;
+import com.panchenko.LogisticsApp.service.ManagerService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,12 @@ import java.util.List;
 public class ContractorServiceImpl implements ContractorService {
     private final ContractorRepository contractorRepository;
     private final ModelMapper modelMapper;
+    private final ManagerService managerService;
 
-    public ContractorServiceImpl(ContractorRepository contractorRepository, ModelMapper modelMapper) {
+    public ContractorServiceImpl(ContractorRepository contractorRepository, ModelMapper modelMapper, ManagerService managerService) {
         this.contractorRepository = contractorRepository;
         this.modelMapper = modelMapper;
+        this.managerService = managerService;
     }
 
     @Override
@@ -36,12 +39,17 @@ public class ContractorServiceImpl implements ContractorService {
     }
 
     @Override
-    public Contractor update(Contractor contractor) {
-        if (contractor == null) {
+    public Contractor update(Contractor updatedContractor, ContractorDTO contractorDTO) {
+        if (updatedContractor == null) {
             throw new NullEntityReferenceException("Contractor cannot be 'null'");
         }
-        readById(contractor.getId());
-        return contractorRepository.save(contractor);
+        if (contractorDTO.getName() != null) {
+            updatedContractor.setName(contractorDTO.getName());
+        }
+        if (contractorDTO.getManagerId() != null) {
+            updatedContractor.setManager(managerService.readById(contractorDTO.getManagerId()));
+        }
+        return contractorRepository.save(updatedContractor);
     }
 
     @Override

@@ -10,7 +10,7 @@ public interface TruckTractorService {
 
     TruckTractor readById(long id);
 
-    TruckTractor update(TruckTractor truckTractor);
+    TruckTractor update(TruckTractor truckTractor, TruckTractorDTO truckTractorDTO);
 
     void delete(long id);
 

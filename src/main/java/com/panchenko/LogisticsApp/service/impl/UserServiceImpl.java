@@ -65,12 +65,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(User user) {
-        if (user == null) {
+    public User update(User updatedUser, UserDTO userDTO) {
+        if (updatedUser == null) {
             throw new NullEntityReferenceException("User cannot be 'null'");
         }
-        readById(user.getId());
-        return userRepository.save(user);
+        if (userDTO.getName() != null) {
+            updatedUser.setName(userDTO.getName());
+        }
+        if (userDTO.getSurname() != null) {
+            updatedUser.setSurname(userDTO.getSurname());
+        }
+        if (userDTO.getEmail() != null) {
+            updatedUser.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getPhone() != null) {
+            updatedUser.setPhone(userDTO.getPhone());
+        }
+        if (userDTO.getLogin() != null) {
+            updatedUser.setLogin(userDTO.getLogin());
+        }
+        if (userDTO.getPassword() != null) {
+            updatedUser.setPassword(userDTO.getPassword());
+        }
+        return userRepository.save(updatedUser);
     }
 
     @Override

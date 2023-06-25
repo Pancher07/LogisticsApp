@@ -36,12 +36,26 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public Driver update(Driver driver) {               //DTO
-        if (driver == null) {
+    public Driver update(Driver updatedDriver, DriverDTO driverDTO) {
+        if (updatedDriver == null) {
             throw new NullEntityReferenceException("Driver cannot be 'null'");
         }
-        readById(driver.getId());
-        return driverRepository.save(driver);
+        if (driverDTO.getName() != null) {
+            updatedDriver.setName(driverDTO.getName());
+        }
+        if (driverDTO.getMiddleName() != null) {
+            updatedDriver.setMiddleName(driverDTO.getMiddleName());
+        }
+        if (driverDTO.getSurname() != null) {
+            updatedDriver.setSurname(driverDTO.getSurname());
+        }
+        if (driverDTO.getPhone() != null) {
+            updatedDriver.setPhone(driverDTO.getPhone());
+        }
+        if (driverDTO.getLastTimeWorked() != null) {
+            updatedDriver.setLastTimeWorked(driverDTO.getLastTimeWorked());
+        }
+        return driverRepository.save(updatedDriver);
     }
 
     @Override

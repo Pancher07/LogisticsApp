@@ -1,16 +1,13 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.ContractorDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Contractor;
 import com.panchenko.LogisticsApp.service.ContractorService;
-import com.panchenko.LogisticsApp.service.ManagerService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,11 +18,9 @@ import java.util.Map;
 @RequestMapping("/api/contractors")
 public class ContractorController {
     private final ContractorService contractorService;
-    private final ManagerService managerService;
 
-    public ContractorController(ContractorService contractorService, ManagerService managerService) {
+    public ContractorController(ContractorService contractorService) {
         this.contractorService = contractorService;
-        this.managerService = managerService;
     }
 
     @GetMapping
@@ -52,16 +47,7 @@ public class ContractorController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid ContractorDTO contractorDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForCreate(bindingResult);
         Contractor contractor = contractorService.create(contractorService.convertToContractor(contractorDTO));
 
         ContractorDTO contractorDTOResponse = contractorService.convertToContractorDTO(contractor);
@@ -77,26 +63,11 @@ public class ContractorController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid ContractorDTO contractorDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         Contractor updatedContractor = contractorService.readById(id);
 
-        if (contractorDTO.getName() != null) {
-            updatedContractor.setName(contractorDTO.getName());
-        }
-        if (contractorDTO.getManagerId() != null) {
-            updatedContractor.setManager(managerService.readById(contractorDTO.getManagerId()));
-        }
-
-        contractorService.update(updatedContractor);
+        contractorService.update(updatedContractor, contractorDTO);
 
         ContractorDTO contractorDTOResponse = contractorService.convertToContractorDTO(updatedContractor);
 

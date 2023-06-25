@@ -4,7 +4,7 @@ import com.panchenko.LogisticsApp.dto.HitchDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.repository.HitchRepository;
-import com.panchenko.LogisticsApp.service.HitchService;
+import com.panchenko.LogisticsApp.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,22 @@ import java.util.List;
 public class HitchServiceImpl implements HitchService {
     private final HitchRepository hitchRepository;
     private final ModelMapper modelMapper;
+    private final TrailerService trailerService;
+    private final DriverService driverService;
+    private final ProjectService projectService;
+    private final LogisticianService logisticianService;
+    private final TruckTractorService truckTractorService;
 
-    public HitchServiceImpl(HitchRepository hitchRepository, ModelMapper modelMapper) {
+    public HitchServiceImpl(HitchRepository hitchRepository, ModelMapper modelMapper, TrailerService trailerService,
+                            DriverService driverService, ProjectService projectService,
+                            LogisticianService logisticianService, TruckTractorService truckTractorService) {
         this.hitchRepository = hitchRepository;
         this.modelMapper = modelMapper;
+        this.trailerService = trailerService;
+        this.driverService = driverService;
+        this.projectService = projectService;
+        this.logisticianService = logisticianService;
+        this.truckTractorService = truckTractorService;
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
     }
 
@@ -37,12 +49,35 @@ public class HitchServiceImpl implements HitchService {
     }
 
     @Override
-    public Hitch update(Hitch hitch) {
-        if (hitch == null) {
+    public Hitch update(Hitch updatedHitch, HitchDTO hitchDTO) {
+        if (updatedHitch == null) {
             throw new NullEntityReferenceException("Hitch cannot be 'null'");
         }
-        readById(hitch.getId());
-        return hitchRepository.save(hitch);
+        if (hitchDTO.getLocation() != null) {
+            updatedHitch.setLocation(hitchDTO.getLocation());
+        }
+        if (hitchDTO.getComment() != null) {
+            updatedHitch.setComment(hitchDTO.getComment());
+        }
+        if (hitchDTO.getVehicleStatus() != null) {
+            updatedHitch.setVehicleStatus(hitchDTO.getVehicleStatus());
+        }
+        if (hitchDTO.getTruckTractorId() != null) {
+            updatedHitch.setTruckTractor(truckTractorService.readById(hitchDTO.getTruckTractorId()));
+        }
+        if (hitchDTO.getTrailerId() != null) {
+            updatedHitch.setTrailer(trailerService.readById(hitchDTO.getTrailerId()));
+        }
+        if (hitchDTO.getDriverId() != null) {
+            updatedHitch.setDriver(driverService.readById(hitchDTO.getDriverId()));
+        }
+        if (hitchDTO.getProjectId() != null) {
+            updatedHitch.setProject(projectService.readById(hitchDTO.getProjectId()));
+        }
+        if (hitchDTO.getLogisticianId() != null) {
+            updatedHitch.setLogistician(logisticianService.readById(hitchDTO.getLogisticianId()));
+        }
+        return hitchRepository.save(updatedHitch);
     }
 
     @Override

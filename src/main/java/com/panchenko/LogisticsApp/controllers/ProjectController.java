@@ -1,18 +1,18 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.ProjectDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.Project;
 import com.panchenko.LogisticsApp.service.ProjectService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,59 +25,61 @@ public class ProjectController {
     }
 
     @GetMapping
-    public List<ProjectDTO> getAll() {
-        return projectService.getAll().stream()
-                .map(this.projectService::convertToProjectDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<?> getAll() {
+        List<ProjectDTO> projectDTOList = projectService.getAll().stream()
+                .map(projectService::convertToProjectDTO).toList();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/projects");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", projectDTOList);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public ProjectDTO getById(@PathVariable long id) {
-        return projectService.convertToProjectDTO(projectService.readById(id));
+    public ResponseEntity<?> getById(@PathVariable long id) {
+        ProjectDTO projectDTO = projectService.convertToProjectDTO(projectService.readById(id));
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/projects/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", projectDTO);
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid ProjectDTO projectDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        projectService.create(projectService.convertToProject(projectDTO));
+    public ResponseEntity<?> create(@RequestBody @Valid ProjectDTO projectDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForCreate(bindingResult);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        Project project = projectService.create(projectService.convertToProject(projectDTO));
+
+        ProjectDTO projectDTOResponse = projectService.convertToProjectDTO(project);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("header", "URL: /api/projects");
+        map.put("status code", HttpStatus.CREATED);
+        map.put("body", projectDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid ProjectDTO projectDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid ProjectDTO projectDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         Project updatedProject = projectService.readById(id);
 
-        if (projectDTO.getPetroleumType() != null) {
-            updatedProject.setPetroleumType(projectDTO.getPetroleumType());
-        }
-        if (projectDTO.getProjectCountry() != null) {
-            updatedProject.setProjectCountry(projectDTO.getProjectCountry());
-        }
+        projectService.update(updatedProject, projectDTO);
 
-        projectService.update(updatedProject);
-        return ResponseEntity.ok(HttpStatus.OK);
+        ProjectDTO projectDTOResponse = projectService.convertToProjectDTO(updatedProject);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("header", "URL: /api/projects/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", projectDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @DeleteMapping("/{id}")

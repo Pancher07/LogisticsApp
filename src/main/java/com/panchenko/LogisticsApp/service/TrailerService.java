@@ -10,7 +10,7 @@ public interface TrailerService {
 
     Trailer readById(long id);
 
-    Trailer update(Trailer trailer);
+    Trailer update(Trailer trailer, TrailerDTO trailerDTO);
 
     void delete(long id);
 

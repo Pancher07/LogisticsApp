@@ -4,7 +4,7 @@ import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
-import com.panchenko.LogisticsApp.service.ManagerOrderService;
+import com.panchenko.LogisticsApp.service.*;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -17,20 +17,35 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
 
     private final ManagerOrderRepository managerOrderRepository;
     private final ModelMapper modelMapper;
+    private final ManagerService managerService;
+    private final ContractorService contractorService;
+    private final TaskListService taskListService;
+    private final HitchService hitchService;
 
-    public ManagerOrderServiceImpl(ManagerOrderRepository managerOrderRepository, ModelMapper modelMapper) {
+    public ManagerOrderServiceImpl(ManagerOrderRepository managerOrderRepository, ModelMapper modelMapper,
+                                   ManagerService managerService, ContractorService contractorService,
+                                   TaskListService taskListService, HitchService hitchService) {
         this.managerOrderRepository = managerOrderRepository;
         this.modelMapper = modelMapper;
+        this.managerService = managerService;
+        this.contractorService = contractorService;
+        this.taskListService = taskListService;
+        this.hitchService = hitchService;
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
     }
 
     @Override
-    public ManagerOrder create(ManagerOrder managerOrder) {
+    public ManagerOrder create(ManagerOrder managerOrder, long managerId) {
         if (managerOrder == null) {
             throw new NullEntityReferenceException("Manager order cannot be 'null'");
         }
-        enrichManagerOrder(managerOrder);
+        enrichManagerOrder(managerOrder, managerId);
         return managerOrderRepository.save(managerOrder);
+    }
+
+    private void enrichManagerOrder(ManagerOrder managerOrder, long managerId) {
+        managerOrder.setManager(managerService.readById(managerId));
+        managerOrder.setCreatedAt(LocalDateTime.now());
     }
 
     @Override
@@ -40,12 +55,41 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     }
 
     @Override
-    public ManagerOrder update(ManagerOrder managerOrder) {
-        if (managerOrder == null) {
+    public ManagerOrder update(ManagerOrder updatedManagerOrder, ManagerOrderDTO managerOrderDTO) {
+        if (updatedManagerOrder == null) {
             throw new NullEntityReferenceException("Manager order cannot be 'null'");
         }
-        readById(managerOrder.getId());
-        return managerOrderRepository.save(managerOrder);
+        if (managerOrderDTO.getTypeOfLightProduct() != null) {
+            updatedManagerOrder.setTypeOfLightProduct(managerOrderDTO.getTypeOfLightProduct());
+        }
+        if (managerOrderDTO.getVolume() != 0) {
+            updatedManagerOrder.setVolume(managerOrderDTO.getVolume());
+        }
+        if (managerOrderDTO.getPump() != null) {
+            updatedManagerOrder.setPump(managerOrderDTO.getPump());
+        }
+        if (managerOrderDTO.getCalibration() != null) {
+            updatedManagerOrder.setCalibration(managerOrderDTO.getCalibration());
+        }
+        if (managerOrderDTO.getContact() != null) {
+            updatedManagerOrder.setContact(managerOrderDTO.getContact());
+        }
+        if (managerOrderDTO.getUploadingDateTime() != null) {
+            updatedManagerOrder.setUploadingDateTime(managerOrderDTO.getUploadingDateTime());
+        }
+        if (managerOrderDTO.getOrderStatus() != null) {
+            updatedManagerOrder.setOrderStatus(managerOrderDTO.getOrderStatus());
+        }
+        if (managerOrderDTO.getContractorId() != null) {
+            updatedManagerOrder.setContractor(contractorService.readById(managerOrderDTO.getContractorId()));
+        }
+        if (managerOrderDTO.getTaskListId() != null) {
+            updatedManagerOrder.setTaskList(taskListService.readById(managerOrderDTO.getTaskListId()));
+        }
+        if (managerOrderDTO.getHitchId() != null) {
+            updatedManagerOrder.setHitch(hitchService.readById(managerOrderDTO.getHitchId()));
+        }
+        return managerOrderRepository.save(updatedManagerOrder);
     }
 
     @Override
@@ -72,9 +116,5 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     @Override
     public ManagerOrderDTO convertToManagerOrderDTO(ManagerOrder managerOrder) {
         return modelMapper.map(managerOrder, ManagerOrderDTO.class);
-    }
-
-    private void enrichManagerOrder(ManagerOrder managerOrder) {
-        managerOrder.setCreatedAt(LocalDateTime.now());
     }
 }

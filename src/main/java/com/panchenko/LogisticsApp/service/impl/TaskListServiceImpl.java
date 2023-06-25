@@ -4,6 +4,7 @@ import com.panchenko.LogisticsApp.dto.TaskListDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.TaskList;
 import com.panchenko.LogisticsApp.repository.TaskListRepository;
+import com.panchenko.LogisticsApp.service.LogisticianService;
 import com.panchenko.LogisticsApp.service.TaskListService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -16,10 +17,13 @@ import java.util.List;
 public class TaskListServiceImpl implements TaskListService {
     private final TaskListRepository taskListRepository;
     private final ModelMapper modelMapper;
+    private final LogisticianService logisticianService;
 
-    public TaskListServiceImpl(TaskListRepository taskListRepository, ModelMapper modelMapper) {
+    public TaskListServiceImpl(TaskListRepository taskListRepository, ModelMapper modelMapper,
+                               LogisticianService logisticianService) {
         this.taskListRepository = taskListRepository;
         this.modelMapper = modelMapper;
+        this.logisticianService = logisticianService;
     }
 
     @Override
@@ -38,12 +42,17 @@ public class TaskListServiceImpl implements TaskListService {
     }
 
     @Override
-    public TaskList update(TaskList taskList) {
-        if (taskList == null) {
+    public TaskList update(TaskList updatedTaskList, TaskListDTO taskListDTO) {
+        if (updatedTaskList == null) {
             throw new NullEntityReferenceException("Task list cannot be 'null'");
         }
-        readById(taskList.getId());
-        return taskListRepository.save(taskList);
+        if (taskListDTO.getStatus() != null) {
+            updatedTaskList.setStatus(taskListDTO.getStatus());
+        }
+        if (taskListDTO.getLogisticianId() != null) {
+            updatedTaskList.setLogistician(logisticianService.readById(taskListDTO.getLogisticianId()));
+        }
+        return taskListRepository.save(updatedTaskList);
     }
 
     @Override

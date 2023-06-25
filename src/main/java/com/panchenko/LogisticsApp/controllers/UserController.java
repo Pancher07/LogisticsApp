@@ -1,20 +1,19 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.UserDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.User;
 import com.panchenko.LogisticsApp.service.UserService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,71 +26,59 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDTO> getAll() {
-        return userService.getAll().stream()
-                .map(this.userService::convertToUserDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<?> getAll() {
+        List<UserDTO> userDTOList = userService.getAll().stream()
+                .map(userService::convertToUserDTO).toList();
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/users");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", userDTOList);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")
-    public UserDTO getById(@PathVariable long id) {
-        return userService.convertToUserDTO(userService.readById(id));
+    public ResponseEntity<?> getById(@PathVariable long id) {
+        UserDTO userDTO = userService.convertToUserDTO(userService.readById(id));
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/users" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", userDTO);
+        return ResponseEntity.ok(map);
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        userService.create(userService.convertToUser(userDTO));
+    public ResponseEntity<?> create(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+        CheckErrors.checkErrorsForCreate(bindingResult);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        User user = userService.create(userService.convertToUser(userDTO));
+
+        UserDTO userDTOResponse = userService.convertToUserDTO(user);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/users");
+        map.put("status code", HttpStatus.CREATED);
+        map.put("body", userDTOResponse);
+        return ResponseEntity.ok(map);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable long id, @RequestBody @Valid UserDTO userDTO,
-                                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append("-").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid UserDTO userDTO,
+                                    BindingResult bindingResult) {
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         User updatedUser = userService.readById(id);
 
-        if (userDTO.getName() != null) {
-            updatedUser.setName(userDTO.getName());
-        }
-        if (userDTO.getSurname() != null) {
-            updatedUser.setSurname(userDTO.getSurname());
-        }
-        if (userDTO.getEmail() != null) {
-            updatedUser.setEmail(userDTO.getEmail());
-        }
-        if (userDTO.getPhone() != null) {
-            updatedUser.setPhone(userDTO.getPhone());
-        }
-        if (userDTO.getLogin() != null) {
-            updatedUser.setLogin(userDTO.getLogin());
-        }
-        if (userDTO.getPassword() != null) {
-            updatedUser.setPassword(userDTO.getPassword());
-        }
+        userService.update(updatedUser, userDTO);
 
-        userService.update(updatedUser);
-        return ResponseEntity.ok(HttpStatus.OK);
+        UserDTO userDTOResponse = userService.convertToUserDTO(updatedUser);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/users/" + id);
+        map.put("status code", HttpStatus.OK);
+        map.put("body", userDTOResponse);
+        return ResponseEntity.ok(map);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteById(@PathVariable long id) {
         userService.delete(id);

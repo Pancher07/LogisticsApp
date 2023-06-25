@@ -1,15 +1,13 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
-import com.panchenko.LogisticsApp.service.*;
+import com.panchenko.LogisticsApp.service.ManagerOrderService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -20,19 +18,9 @@ import java.util.Map;
 @RequestMapping("/api/manager-orders")
 public class ManagerOrderController {
     private final ManagerOrderService managerOrderService;
-    private final ManagerService managerService;
-    private final ContractorService contractorService;
-    private final TaskListService taskListService;
-    private final HitchService hitchService;
 
-    public ManagerOrderController(ManagerOrderService managerOrderService, ManagerService managerService,
-                                  ContractorService contractorService, TaskListService taskListService,
-                                  HitchService hitchService) {
+    public ManagerOrderController(ManagerOrderService managerOrderService) {
         this.managerOrderService = managerOrderService;
-        this.managerService = managerService;
-        this.contractorService = contractorService;
-        this.taskListService = taskListService;
-        this.hitchService = hitchService;
     }
 
     @GetMapping
@@ -75,18 +63,11 @@ public class ManagerOrderController {
     public ResponseEntity<?> create(@PathVariable("manager_id") long managerId,
                                     @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
-        ManagerOrder managerOrder = managerOrderService.create(managerOrderService.convertToManagerOrder(managerOrderDTO));
-        managerOrder.setManager(managerService.readById(managerId));
+        CheckErrors.checkErrorsForCreate(bindingResult);
+
+        ManagerOrder managerOrder = managerOrderService
+                .create(managerOrderService.convertToManagerOrder(managerOrderDTO), managerId);
+
         ManagerOrderDTO managerOrderDTOResponse = managerOrderService.convertToManagerOrderDTO(managerOrder);
 
         Map<String, Object> map = new HashMap<>();
@@ -100,50 +81,11 @@ public class ManagerOrderController {
     public ResponseEntity<?> update(@PathVariable("manager_id") long managerId, @PathVariable("order_id") long orderId,
                                     @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         ManagerOrder updatedManagerOrder = managerOrderService.readById(orderId);
 
-        if (managerOrderDTO.getTypeOfLightProduct() != null) {
-            updatedManagerOrder.setTypeOfLightProduct(managerOrderDTO.getTypeOfLightProduct());
-        }
-        if (managerOrderDTO.getVolume() != 0) {
-            updatedManagerOrder.setVolume(managerOrderDTO.getVolume());
-        }
-        if (managerOrderDTO.getPump() != null) {
-            updatedManagerOrder.setPump(managerOrderDTO.getPump());
-        }
-        if (managerOrderDTO.getCalibration() != null) {
-            updatedManagerOrder.setCalibration(managerOrderDTO.getCalibration());
-        }
-        if (managerOrderDTO.getContact() != null) {
-            updatedManagerOrder.setContact(managerOrderDTO.getContact());
-        }
-        if (managerOrderDTO.getUploadingDateTime() != null) {
-            updatedManagerOrder.setUploadingDateTime(managerOrderDTO.getUploadingDateTime());
-        }
-        if (managerOrderDTO.getOrderStatus() != null) {
-            updatedManagerOrder.setOrderStatus(managerOrderDTO.getOrderStatus());
-        }
-        if (managerOrderDTO.getContractorId() != null) {
-            updatedManagerOrder.setContractor(contractorService.readById(managerOrderDTO.getContractorId()));
-        }
-        if (managerOrderDTO.getTaskListId() != null) {
-            updatedManagerOrder.setTaskList(taskListService.readById(managerOrderDTO.getTaskListId()));
-        }
-        if (managerOrderDTO.getHitchId() != null) {
-            updatedManagerOrder.setHitch(hitchService.readById(managerOrderDTO.getHitchId()));
-        }
-
-        managerOrderService.update(updatedManagerOrder);
+        managerOrderService.update(updatedManagerOrder, managerOrderDTO);
 
         ManagerOrderDTO managerOrderDTOResponse = managerOrderService.convertToManagerOrderDTO(updatedManagerOrder);
 

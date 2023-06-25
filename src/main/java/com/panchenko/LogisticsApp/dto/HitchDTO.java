@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.dto;
 
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data

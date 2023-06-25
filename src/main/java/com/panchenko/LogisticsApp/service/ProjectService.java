@@ -10,7 +10,7 @@ public interface ProjectService {
 
     Project readById(long id);
 
-    Project update(Project project);
+    Project update(Project project, ProjectDTO projectDTO);
 
     void delete(long id);
 

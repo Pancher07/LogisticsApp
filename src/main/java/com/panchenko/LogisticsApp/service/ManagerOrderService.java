@@ -6,11 +6,11 @@ import com.panchenko.LogisticsApp.model.ManagerOrder;
 import java.util.List;
 
 public interface ManagerOrderService {
-    ManagerOrder create(ManagerOrder managerOrder);
+    ManagerOrder create(ManagerOrder managerOrder, long managerId);
 
     ManagerOrder readById(long id);
 
-    ManagerOrder update(ManagerOrder managerOrder);
+    ManagerOrder update(ManagerOrder managerOrder, ManagerOrderDTO managerOrderDTO);
 
     void delete(long id);
 

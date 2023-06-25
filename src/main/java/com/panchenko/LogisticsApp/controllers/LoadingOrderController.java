@@ -1,16 +1,13 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.LoadingOrderDTO;
-import com.panchenko.LogisticsApp.exception.EntityNotCreatedException;
-import com.panchenko.LogisticsApp.exception.EntityNotUpdatedException;
 import com.panchenko.LogisticsApp.model.LoadingOrder;
 import com.panchenko.LogisticsApp.service.LoadingOrderService;
-import com.panchenko.LogisticsApp.service.TaskListService;
+import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,18 +18,15 @@ import java.util.Map;
 @RequestMapping("/api/loading-orders")
 public class LoadingOrderController {
     private final LoadingOrderService loadingOrderService;
-    private final TaskListService taskListService;
 
-    public LoadingOrderController(LoadingOrderService loadingOrderService, TaskListService taskListService) {
+    public LoadingOrderController(LoadingOrderService loadingOrderService) {
         this.loadingOrderService = loadingOrderService;
-        this.taskListService = taskListService;
     }
 
     @GetMapping
     public ResponseEntity<?> getAll() {
         List<LoadingOrderDTO> loadingOrderDTOList = loadingOrderService.getAll().stream()
                 .map(loadingOrderService::convertToLoadingOrderDTO).toList();
-
         Map<String, Object> map = new HashMap<>();
         map.put("header", "URL: /api/loading-orders");
         map.put("status code", HttpStatus.OK);
@@ -53,16 +47,8 @@ public class LoadingOrderController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid LoadingOrderDTO loadingOrderDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotCreatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForCreate(bindingResult);
+
         LoadingOrder loadingOrder = loadingOrderService.create(loadingOrderService.convertToLoadingOrder(loadingOrderDTO));
 
         LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(loadingOrder);
@@ -77,38 +63,11 @@ public class LoadingOrderController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid LoadingOrderDTO loadingOrderDTO,
                                     BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new EntityNotUpdatedException(errorMessage.toString());
-        }
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
         LoadingOrder updatedLoadingOrder = loadingOrderService.readById(id);
 
-        if (loadingOrderDTO.getLoadingPoint() != null) {
-            updatedLoadingOrder.setLoadingPoint(loadingOrderDTO.getLoadingPoint());
-        }
-        if (loadingOrderDTO.getPetroleumType() != null) {
-            updatedLoadingOrder.setPetroleumType(loadingOrderDTO.getPetroleumType());
-        }
-        if (loadingOrderDTO.getCountOfVehicle() != 0) {
-            updatedLoadingOrder.setCountOfVehicle(loadingOrderDTO.getCountOfVehicle());
-        }
-        if (loadingOrderDTO.getLoadingDateTime() != null) {
-            updatedLoadingOrder.setLoadingDateTime(loadingOrderDTO.getLoadingDateTime());
-        }
-        if (loadingOrderDTO.getOrderStatus() != null) {
-            updatedLoadingOrder.setOrderStatus(loadingOrderDTO.getOrderStatus());
-        }
-        if (loadingOrderDTO.getTaskListId() != null) {
-            updatedLoadingOrder.setTaskList(taskListService.readById(loadingOrderDTO.getTaskListId()));
-        }
-
-        loadingOrderService.update(updatedLoadingOrder);
+        loadingOrderService.update(updatedLoadingOrder, loadingOrderDTO);
 
         LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(updatedLoadingOrder);
 

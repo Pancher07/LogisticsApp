@@ -10,7 +10,7 @@ public interface HitchService {
 
     Hitch readById(long id);
 
-    Hitch update(Hitch hitch);
+    Hitch update(Hitch hitch, HitchDTO hitchDTO);
 
     void delete(long id);
 
