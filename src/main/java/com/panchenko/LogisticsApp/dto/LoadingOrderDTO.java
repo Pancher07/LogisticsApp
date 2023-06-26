@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.dto;
 
 import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class LoadingOrderDTO {
 
     private PetroleumType petroleumType;
 
-    private int countOfVehicle;
+    private Integer countOfVehicle;
 
     private LocalDateTime loadingDateTime;
 

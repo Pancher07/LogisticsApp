@@ -87,6 +87,9 @@ public class UserServiceImpl implements UserService {
         if (userDTO.getPassword() != null) {
             updatedUser.setPassword(userDTO.getPassword());
         }
+        if (userDTO.getRole() != null) {
+            updatedUser.setRole(userDTO.getRole());
+        }
         return userRepository.save(updatedUser);
     }
 

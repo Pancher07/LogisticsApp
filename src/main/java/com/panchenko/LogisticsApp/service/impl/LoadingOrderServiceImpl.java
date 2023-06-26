@@ -52,7 +52,7 @@ public class LoadingOrderServiceImpl implements LoadingOrderService {
         if (loadingOrderDTO.getPetroleumType() != null) {
             updatedLoadingOrder.setPetroleumType(loadingOrderDTO.getPetroleumType());
         }
-        if (loadingOrderDTO.getCountOfVehicle() != 0) {
+        if (loadingOrderDTO.getCountOfVehicle() != null) {
             updatedLoadingOrder.setCountOfVehicle(loadingOrderDTO.getCountOfVehicle());
         }
         if (loadingOrderDTO.getLoadingDateTime() != null) {

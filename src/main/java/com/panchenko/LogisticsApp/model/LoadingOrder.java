@@ -3,6 +3,7 @@ package com.panchenko.LogisticsApp.model;
 import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class LoadingOrder {
     private PetroleumType petroleumType;
 
     @Column(name = "count_of_vehicle", nullable = false)
-    private int countOfVehicle;
+    private Integer countOfVehicle;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
