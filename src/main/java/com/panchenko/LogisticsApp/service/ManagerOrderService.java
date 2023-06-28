@@ -20,4 +20,6 @@ public interface ManagerOrderService {
     ManagerOrder convertToManagerOrder(ManagerOrderDTO managerOrderDTO);
 
     ManagerOrderDTO convertToManagerOrderDTO(ManagerOrder managerOrder);
+
+    ManagerOrder chooseHitch(ManagerOrder managerOrder);
 }

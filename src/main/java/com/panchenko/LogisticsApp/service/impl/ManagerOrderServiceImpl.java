@@ -2,7 +2,9 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
+import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
+import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
 import com.panchenko.LogisticsApp.service.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -116,5 +119,18 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     @Override
     public ManagerOrderDTO convertToManagerOrderDTO(ManagerOrder managerOrder) {
         return modelMapper.map(managerOrder, ManagerOrderDTO.class);
+    }
+
+    @Override
+    public ManagerOrder chooseHitch(ManagerOrder managerOrder) {
+        List<Hitch> loadedHitches = new ArrayList<>();
+        switch (managerOrder.getTypeOfLightProduct()) {
+            case DIESEL_FUEL -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
+            case A95 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A95);
+            case A92 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A92);
+        }
+        //TODO
+
+        return null;
     }
 }

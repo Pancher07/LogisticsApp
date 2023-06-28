@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.service;
 
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
 import com.panchenko.LogisticsApp.model.Trailer;
+import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 
 import java.util.List;
 

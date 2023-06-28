@@ -102,4 +102,23 @@ public class ManagerOrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    //TODO
+    @PutMapping("/{manager_id}/{order_id}/choose-hitch")
+    public ResponseEntity<?> chooseHitch(@PathVariable("manager_id") long managerId,
+                                         @PathVariable("order_id") long orderId,
+                                         @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
+                                         BindingResult bindingResult) {
+        CheckErrors.checkErrorsForUpdate(bindingResult);
+
+        ManagerOrder managerOrder = managerOrderService.readById(orderId);
+
+        managerOrderService.chooseHitch(managerOrder);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/manager-orders/" + managerId + "/" + orderId);
+        map.put("status code", HttpStatus.OK);
+        //map.put("body", managerOrderDTOResponse);
+        return ResponseEntity.ok(map);
+    }
+
 }

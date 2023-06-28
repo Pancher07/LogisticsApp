@@ -3,6 +3,7 @@ package com.panchenko.LogisticsApp.service.impl;
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Trailer;
+import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import com.panchenko.LogisticsApp.repository.TrailerRepository;
 import com.panchenko.LogisticsApp.service.TrailerService;
 import jakarta.persistence.EntityNotFoundException;

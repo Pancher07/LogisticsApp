@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.TrailerDTO;
 import com.panchenko.LogisticsApp.model.Trailer;
+import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
 import com.panchenko.LogisticsApp.service.TrailerService;
 import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;

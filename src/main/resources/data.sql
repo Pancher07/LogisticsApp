@@ -1,0 +1,46 @@
+INSERT INTO users(name, surname, email, login, password, phone, role, user_active)
+VALUES ('User1', 'Userenko1', 'user1@user.com', 'user1', 'password1', '+380501111111', 1, true);
+
+INSERT INTO users(name, surname, email, login, password, phone, role, user_active)
+VALUES ('User2', 'Userenko2', 'user2@user.com', 'user2', 'password2', '+380502222222', 2, true);
+
+INSERT INTO managers(user_id)
+VALUES (1);
+
+INSERT INTO logisticians(user_id)
+VALUES (2);
+
+INSERT INTO truck_tractors(plate_number, model, pump)
+VALUES ('BH1234BH', 'DAF', 1);
+
+INSERT INTO trailers(plate_number, model, volume, calibration, petroleum_type)
+VALUES ('BH1111BH', 'Kassbohrer', 31000, 0, 0);
+
+INSERT INTO trailers(plate_number, model, volume, calibration, petroleum_type)
+VALUES ('BH2222BH', 'Kassbohrer', 31000, 0, 0);
+
+INSERT INTO trailers(plate_number, model, volume, calibration, petroleum_type)
+VALUES ('BH3333BH', 'Kassbohrer', 31000, 0, 1);
+
+INSERT INTO drivers(name, middle_name, surname, phone)
+VALUES ('Іван', 'Іванович', 'Іванов', '+380111111111');
+
+INSERT INTO projects(petroleum_type, project_country)
+VALUES (0, 0);
+
+INSERT INTO contractors(manager_id, name)
+VALUES (1, 'ТОВ ЗНГК');
+
+INSERT INTO task_lists(status, created_at, logistician_id)
+VALUES (0, '2023-06-21 14:00:00', 1);
+
+INSERT INTO hitches (vehicle_status, driver_id, logistician_id, project_id, trailer_id, truck_tractor_id, comment,
+                     location)
+VALUES (0, 1, 1, 1, 1, 1, 'no comment', 'Измаил');
+
+INSERT INTO loading_orders (count_of_vehicle, petroleum_type, status, created_at, loading_date_time, task_list_id, loading_point)
+VALUES (100, 0, 0, '2023-06-27 14:00:00', '2023-06-30 08:00:00', 1, 'Измаил');
+
+INSERT INTO manager_orders (calibration, pump, status, type_of_product, volume, contractor_id, created_at, hitch_id,
+                            manager_id, task_list_id, uploading_date_time, contact)
+VALUES (1, 0, 0, 0, 31000, 1, '2023-06-27 15:00:00', null, 1, null, '2023-06-28 14:00:00', 'contact +38050000000')

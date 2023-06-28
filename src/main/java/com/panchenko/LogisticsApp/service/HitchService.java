@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.service;
 
 import com.panchenko.LogisticsApp.dto.HitchDTO;
 import com.panchenko.LogisticsApp.model.Hitch;
+import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface HitchService {
     Hitch convertToHitch(HitchDTO hitchDTO);
 
     HitchDTO convertToHitchDTO(Hitch hitch);
+
+    List<Hitch> getAllByVehicleStatus(VehicleStatus vehicleStatus);
 }
