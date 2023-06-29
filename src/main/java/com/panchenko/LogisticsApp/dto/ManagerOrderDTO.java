@@ -1,7 +1,7 @@
 package com.panchenko.LogisticsApp.dto;
 
-import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class ManagerOrderDTO {
     private PresenceOfPumpOrCalibration calibration;
     private String contact;
     private LocalDateTime uploadingDateTime;
-    private OrderStatus orderStatus;
+    private TaskListAndOrderStatus orderStatus;
     private Long contractorId;
     private Long managerId;
     private Long taskListId;

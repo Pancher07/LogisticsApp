@@ -1,7 +1,7 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ public class ManagerOrder {
     private LocalDateTime uploadingDateTime;
 
     @Column(name = "status", nullable = false)
-    private OrderStatus orderStatus;
+    private TaskListAndOrderStatus orderStatus;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

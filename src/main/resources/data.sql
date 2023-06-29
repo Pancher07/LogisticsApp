@@ -13,6 +13,12 @@ VALUES (2);
 INSERT INTO truck_tractors(plate_number, model, pump)
 VALUES ('BH1234BH', 'DAF', 1);
 
+INSERT INTO truck_tractors(plate_number, model, pump)
+VALUES ('BH2233BH', 'DAF', 1);
+
+INSERT INTO truck_tractors(plate_number, model, pump)
+VALUES ('BH3344BH', 'DAF', 1);
+
 INSERT INTO trailers(plate_number, model, volume, calibration, petroleum_type)
 VALUES ('BH1111BH', 'Kassbohrer', 31000, 0, 0);
 
@@ -22,8 +28,14 @@ VALUES ('BH2222BH', 'Kassbohrer', 31000, 0, 0);
 INSERT INTO trailers(plate_number, model, volume, calibration, petroleum_type)
 VALUES ('BH3333BH', 'Kassbohrer', 31000, 0, 1);
 
-INSERT INTO drivers(name, middle_name, surname, phone)
-VALUES ('Іван', 'Іванович', 'Іванов', '+380111111111');
+INSERT INTO drivers(name, middle_name, surname, phone, last_time_worked)
+VALUES ('Іван', 'Іванович', 'Іванов', '+380111111111', '2023-06-22 14:00:00');
+
+INSERT INTO drivers(name, middle_name, surname, phone, last_time_worked)
+VALUES ('Джон', 'Джонович', 'Джонсонюк', '+3802222222', '2023-06-20 14:00:00');
+
+INSERT INTO drivers(name, middle_name, surname, phone, last_time_worked)
+VALUES ('Максим', 'Максимович', 'Максименко', '+380333333333', '2023-06-15 14:00:00');
 
 INSERT INTO projects(petroleum_type, project_country)
 VALUES (0, 0);
@@ -37,6 +49,14 @@ VALUES (0, '2023-06-21 14:00:00', 1);
 INSERT INTO hitches (vehicle_status, driver_id, logistician_id, project_id, trailer_id, truck_tractor_id, comment,
                      location)
 VALUES (0, 1, 1, 1, 1, 1, 'no comment', 'Измаил');
+
+INSERT INTO hitches (vehicle_status, driver_id, logistician_id, project_id, trailer_id, truck_tractor_id, comment,
+                     location)
+VALUES (0, 2, 1, 1, 2, 2, 'no comment', 'Измаил');
+
+INSERT INTO hitches (vehicle_status, driver_id, logistician_id, project_id, trailer_id, truck_tractor_id, comment,
+                     location)
+VALUES (0, 3, 1, 1, 3, 3, 'no comment', 'Измаил');
 
 INSERT INTO loading_orders (count_of_vehicle, petroleum_type, status, created_at, loading_date_time, task_list_id, loading_point)
 VALUES (100, 0, 0, '2023-06-27 14:00:00', '2023-06-30 08:00:00', 1, 'Измаил');

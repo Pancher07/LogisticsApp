@@ -4,6 +4,8 @@ import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
+import com.panchenko.LogisticsApp.model.TaskList;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
 import com.panchenko.LogisticsApp.service.*;
@@ -12,8 +14,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ManagerOrderServiceImpl implements ManagerOrderService {
@@ -122,15 +124,43 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     }
 
     @Override
-    public ManagerOrder chooseHitch(ManagerOrder managerOrder) {
+    public Hitch selectHitch(ManagerOrder managerOrder) {
         List<Hitch> loadedHitches = new ArrayList<>();
         switch (managerOrder.getTypeOfLightProduct()) {
             case DIESEL_FUEL -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
             case A95 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A95);
             case A92 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A92);
         }
-        //TODO
+        loadedHitches.stream()
+                .filter(hitch -> hitch.getTrailer().getVolume() == managerOrder.getVolume())
+                .filter(hitch -> hitch.getTrailer().getCalibration() == managerOrder.getCalibration())
+                .collect(Collectors.toList());
 
-        return null;
+        TreeMap<LocalDateTime, Hitch> timeHitchMap = new TreeMap<>();
+        for (Hitch hitch : loadedHitches) {
+            timeHitchMap.put(hitch.getDriver().getLastTimeWorked(), hitch);
+        }
+        Hitch resultHitch = null;
+        if (timeHitchMap.firstEntry() != null) {
+            resultHitch = timeHitchMap.firstEntry().getValue();
+        }
+        return resultHitch;
+    }
+
+    @Override
+    public void setHitch(ManagerOrder managerOrder) {
+        if (managerOrder.getTaskList() == null) {
+            Hitch hitch = selectHitch(managerOrder);
+            managerOrder.setHitch(hitch);
+            managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
+
+            TaskList taskList = new TaskList();
+            taskList.setCreatedAt(LocalDateTime.now());
+            taskList.setStatus(TaskListAndOrderStatus.IN_WORK);
+            taskList.setLogistician(hitch.getLogistician());
+            taskListService.create(taskList);
+            managerOrder.setTaskList(taskList);
+            managerOrderRepository.save(managerOrder);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
-import com.panchenko.LogisticsApp.model.enumeration.TaskListStatus;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class TaskList {
     private Long id;
 
     @Column(name = "status")
-    private TaskListStatus status;
+    private TaskListAndOrderStatus status;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

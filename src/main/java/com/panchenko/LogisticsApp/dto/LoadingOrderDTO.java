@@ -1,8 +1,7 @@
 package com.panchenko.LogisticsApp.dto;
 
-import com.panchenko.LogisticsApp.model.enumeration.OrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.PetroleumType;
-import jakarta.validation.constraints.NotNull;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -21,7 +20,7 @@ public class LoadingOrderDTO {
 
     private LocalDateTime loadingDateTime;
 
-    private OrderStatus orderStatus;
+    private TaskListAndOrderStatus orderStatus;
 
     private Long taskListId;
 }

@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.service;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
+import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
 
 import java.util.List;
@@ -15,11 +16,13 @@ public interface ManagerOrderService {
     void delete(long id);
 
     List<ManagerOrder> getAll();
+
     List<ManagerOrder> getByManagerId(long managerId);
 
     ManagerOrder convertToManagerOrder(ManagerOrderDTO managerOrderDTO);
 
     ManagerOrderDTO convertToManagerOrderDTO(ManagerOrder managerOrder);
 
-    ManagerOrder chooseHitch(ManagerOrder managerOrder);
+    Hitch selectHitch(ManagerOrder managerOrder);
+    public void setHitch(ManagerOrder managerOrder);
 }

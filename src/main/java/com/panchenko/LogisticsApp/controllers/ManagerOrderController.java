@@ -1,7 +1,10 @@
 package com.panchenko.LogisticsApp.controllers;
 
+import com.panchenko.LogisticsApp.dto.HitchDTO;
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
+import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
+import com.panchenko.LogisticsApp.service.HitchService;
 import com.panchenko.LogisticsApp.service.ManagerOrderService;
 import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
@@ -18,9 +21,11 @@ import java.util.Map;
 @RequestMapping("/api/manager-orders")
 public class ManagerOrderController {
     private final ManagerOrderService managerOrderService;
+    private final HitchService hitchService;
 
-    public ManagerOrderController(ManagerOrderService managerOrderService) {
+    public ManagerOrderController(ManagerOrderService managerOrderService, HitchService hitchService) {
         this.managerOrderService = managerOrderService;
+        this.hitchService = hitchService;
     }
 
     @GetMapping
@@ -102,23 +107,34 @@ public class ManagerOrderController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    //TODO
-    @PutMapping("/{manager_id}/{order_id}/choose-hitch")
-    public ResponseEntity<?> chooseHitch(@PathVariable("manager_id") long managerId,
-                                         @PathVariable("order_id") long orderId,
-                                         @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
-                                         BindingResult bindingResult) {
-        CheckErrors.checkErrorsForUpdate(bindingResult);
+    @GetMapping("/{manager_id}/{order_id}/select-hitch")
+    public ResponseEntity<?> selectHitch(@PathVariable("manager_id") long managerId,
+                                         @PathVariable("order_id") long orderId) {
 
-        ManagerOrder managerOrder = managerOrderService.readById(orderId);
+        Hitch selectedHitch = managerOrderService.selectHitch(managerOrderService.readById(orderId));
 
-        managerOrderService.chooseHitch(managerOrder);
+        HitchDTO selectedHitchDTOResponse = hitchService.convertToHitchDTO(selectedHitch);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/manager-orders/" + managerId + "/" + orderId);
+        map.put("header", "URL: /api/manager-orders/" + managerId + "/" + orderId + "/select-hitch");
         map.put("status code", HttpStatus.OK);
-        //map.put("body", managerOrderDTOResponse);
+        map.put("body", selectedHitchDTOResponse);
         return ResponseEntity.ok(map);
     }
 
+    @PutMapping("/{manager_id}/{order_id}/select-hitch")
+    public ResponseEntity<?> setHitch(@PathVariable("manager_id") long managerId,
+                                      @PathVariable("order_id") long orderId) {
+        managerOrderService.setHitch(managerOrderService.readById(managerId));
+
+        ManagerOrderDTO managerOrderDTOResponse = managerOrderService
+                .convertToManagerOrderDTO(managerOrderService.readById(orderId));
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("header", "URL: /api/manager-orders/" + managerId + "/" + orderId + "/select-hitch");
+        map.put("status code", HttpStatus.OK);
+        map.put("body", managerOrderDTOResponse);
+        return ResponseEntity.ok(map);
+
+    }
 }
