@@ -1,5 +1,6 @@
 package com.panchenko.LogisticsApp.dto;
 
+import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -12,6 +13,8 @@ public class HitchDTO {
     private String comment;
 
     private VehicleStatus vehicleStatus;
+
+    private TypeOfLightProduct loadedWithProduct;
 
     private Long truckTractorId;
 

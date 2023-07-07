@@ -3,8 +3,10 @@ package com.panchenko.LogisticsApp.service.impl;
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
+import com.panchenko.LogisticsApp.model.Manager;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
 import com.panchenko.LogisticsApp.model.TaskList;
+import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
 import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
@@ -14,8 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class ManagerOrderServiceImpl implements ManagerOrderService {
@@ -114,6 +115,16 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     }
 
     @Override
+    public List<ManagerOrder> getByManager(Manager manager) {
+        return managerOrderRepository.findByManager(manager);
+    }
+
+    @Override
+    public List<ManagerOrder> getManagerOrdersByStatus(TaskListAndOrderStatus status) {
+        return managerOrderRepository.findByOrderStatus(status);
+    }
+
+    @Override
     public ManagerOrder convertToManagerOrder(ManagerOrderDTO managerOrderDTO) {
         return modelMapper.map(managerOrderDTO, ManagerOrder.class);
     }
@@ -124,43 +135,71 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     }
 
     @Override
-    public Hitch selectHitch(ManagerOrder managerOrder) {
-        List<Hitch> loadedHitches = new ArrayList<>();
-        switch (managerOrder.getTypeOfLightProduct()) {
-            case DIESEL_FUEL -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
-            case A95 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A95);
-            case A92 -> loadedHitches = hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A92);
+    public Hitch selectHitch(ManagerOrder managerOrder/*, List<Hitch> skippedHitch*/) {
+        List<Hitch> loadedHitches =
+                switch (managerOrder.getTypeOfLightProduct()) {
+                    case DIESEL_FUEL -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
+                    case A95 -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A95);
+                    case A92 -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A92);
+                };
+        if (loadedHitches.isEmpty()) {
+            throw new NullEntityReferenceException("The program cannot select a hitch because there is no hitch that " +
+                    "matches the selection criteria");
         }
-        loadedHitches.stream()
-                .filter(hitch -> hitch.getTrailer().getVolume() == managerOrder.getVolume())
-                .filter(hitch -> hitch.getTrailer().getCalibration() == managerOrder.getCalibration())
-                .collect(Collectors.toList());
+        List<Hitch> hitches = loadedHitches.stream()
+                .filter(hitch -> managerOrder.getVolume() == hitch.getTrailer().getVolume())
+                .filter(hitch -> managerOrder.getCalibration().equals(PresenceOfPumpOrCalibration.YES) ?
+                        managerOrder.getCalibration() == hitch.getTrailer().getCalibration() :
+                        managerOrder.getCalibration() == hitch.getTrailer().getCalibration() ||
+                                managerOrder.getCalibration() != hitch.getTrailer().getCalibration())
+                .toList();
 
-        TreeMap<LocalDateTime, Hitch> timeHitchMap = new TreeMap<>();
-        for (Hitch hitch : loadedHitches) {
-            timeHitchMap.put(hitch.getDriver().getLastTimeWorked(), hitch);
+        if (hitches.isEmpty()) {
+            throw new NullEntityReferenceException("The program cannot select a hitch because there is no hitch that " +
+                    "matches the selection criteria");
         }
-        Hitch resultHitch = null;
-        if (timeHitchMap.firstEntry() != null) {
-            resultHitch = timeHitchMap.firstEntry().getValue();
-        }
-        return resultHitch;
+        List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
+                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
+                .toList();
+
+        return resultList.get(0);
     }
 
     @Override
-    public void setHitch(ManagerOrder managerOrder) {
-        if (managerOrder.getTaskList() == null) {
-            Hitch hitch = selectHitch(managerOrder);
-            managerOrder.setHitch(hitch);
-            managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
-
-            TaskList taskList = new TaskList();
-            taskList.setCreatedAt(LocalDateTime.now());
-            taskList.setStatus(TaskListAndOrderStatus.IN_WORK);
-            taskList.setLogistician(hitch.getLogistician());
-            taskListService.create(taskList);
-            managerOrder.setTaskList(taskList);
-            managerOrderRepository.save(managerOrder);
+    public ManagerOrder approveHitch(Long managerOrderId, Hitch hitch) {
+        ManagerOrder managerOrder = readById(managerOrderId);
+        if (managerOrder == null || hitch == null) {
+            throw new NullEntityReferenceException("managerOrderId or hitch cannot be null");
         }
+        if (managerOrder.getHitch() == hitch) {
+            return managerOrder;
+        }
+        if (managerOrder.getHitch() != null) {
+            managerOrder.getHitch().setVehicleStatus(
+                    switch (hitch.getLoadedWithProduct()) {
+                        case DIESEL_FUEL -> VehicleStatus.LOADED_DIESEL;
+                        case A95 -> VehicleStatus.LOADED_A95;
+                        case A92 -> VehicleStatus.LOADED_A92;
+                    }
+            );
+            taskListService.delete(managerOrder.getTaskList().getId());
+            managerOrder.setOrderStatus(TaskListAndOrderStatus.OPENED);
+        }
+
+        managerOrder.setHitch(hitch);
+        managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
+        hitch.setVehicleStatus(VehicleStatus.UNLOADING);
+
+        TaskList taskList = new TaskList();
+        taskList.setCreatedAt(LocalDateTime.now());
+        taskList.setStatus(TaskListAndOrderStatus.IN_WORK);
+        taskList.setLogistician(hitch.getLogistician());
+        taskList.setManagerOrder(managerOrder);
+        taskListService.create(taskList);
+        managerOrder.setTaskList(taskList);
+
+        managerOrderRepository.save(managerOrder);
+
+        return managerOrder;
     }
 }

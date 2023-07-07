@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDateTime;
 
@@ -52,8 +53,7 @@ public class ManagerOrder {
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private Manager manager;
 
-    @ManyToOne
-    @JoinColumn(name = "task_list_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "managerOrder", cascade = CascadeType.REMOVE)
     private TaskList taskList;
 
     @OneToOne

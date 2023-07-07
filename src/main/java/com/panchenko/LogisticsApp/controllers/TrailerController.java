@@ -28,55 +28,32 @@ public class TrailerController {
     public ResponseEntity<?> getAll() {
         List<TrailerDTO> trailerDTOList = trailerService.getAll().stream()
                 .map(trailerService::convertToTrailerDTO).toList();
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/trailers");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", trailerDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(trailerDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         TrailerDTO trailerDTO = trailerService.convertToTrailerDTO(trailerService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/trailers/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", trailerDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(trailerDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid TrailerDTO trailerDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         Trailer trailer = trailerService.create(trailerService.convertToTrailer(trailerDTO));
-
         TrailerDTO trailerDTOResponse = trailerService.convertToTrailerDTO(trailer);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/trailers");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", trailerDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(trailerDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TrailerDTO trailerDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         Trailer updatedTrailer = trailerService.readById(id);
-
         trailerService.update(updatedTrailer, trailerDTO);
-
         TrailerDTO trailerDTOResponse = trailerService.convertToTrailerDTO(updatedTrailer);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/trailers/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", trailerDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(trailerDTOResponse);
     }
 
     @DeleteMapping("/{id}")

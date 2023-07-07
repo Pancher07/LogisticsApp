@@ -10,9 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/hitches")
@@ -27,22 +25,13 @@ public class HitchController {
     public ResponseEntity<?> getAll() {
         List<HitchDTO> hitchDTOList = hitchService.getAll().stream()
                 .map(hitchService::convertToHitchDTO).toList();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/hitches");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", hitchDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(hitchDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         HitchDTO hitchDTO = hitchService.convertToHitchDTO(hitchService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/hitches/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", hitchDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(hitchDTO);
     }
 
     @PostMapping
@@ -50,32 +39,18 @@ public class HitchController {
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
         Hitch hitch = hitchService.create(hitchService.convertToHitch(hitchDTO));
-
         HitchDTO hitchDTOResponse = hitchService.convertToHitchDTO(hitch);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/hitches");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", hitchDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(hitchDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid HitchDTO hitchDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         Hitch updatedHitch = hitchService.readById(id);
-
         hitchService.update(updatedHitch, hitchDTO);
-
         HitchDTO hitchDTOResponse = hitchService.convertToHitchDTO(updatedHitch);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/hitches/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", hitchDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(hitchDTOResponse);
     }
 
     @DeleteMapping("/{id}")

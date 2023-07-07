@@ -10,9 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,53 +27,31 @@ public class DriverController {
         List<DriverDTO> driverDTOList = driverService.getAll().stream()
                 .map(this.driverService::convertToDriverDTO)
                 .collect(Collectors.toList());
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/drivers");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", driverDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(driverDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         DriverDTO driverDTO = driverService.convertToDriverDTO(driverService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/drivers/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", driverDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(driverDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid DriverDTO driverDTO, BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         Driver driver = driverService.create(driverService.convertToDriver(driverDTO));
-
         DriverDTO driverDTOResponse = driverService.convertToDriverDTO(driver);
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/drivers");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", driverDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(driverDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid DriverDTO driverDTO,
-                                             BindingResult bindingResult) {
+                                    BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         Driver updatedDriver = driverService.readById(id);
-
         driverService.update(updatedDriver, driverDTO);
-
         DriverDTO driverDTOResponse = driverService.convertToDriverDTO(updatedDriver);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/drivers/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", driverDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(driverDTOResponse);
     }
 
     @DeleteMapping("/{id}")

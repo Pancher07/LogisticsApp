@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,9 +30,11 @@ public class TaskList {
     @JoinColumn(name = "logistician_id", referencedColumnName = "id")
     private Logistician logistician;
 
-    @OneToMany(mappedBy = "taskList")
-    private List<LoadingOrder> loadingOrders;
+    @OneToOne
+    @JoinColumn(name = "loading_order_id", referencedColumnName = "id")
+    private LoadingOrder loadingOrder;
 
-    @OneToMany(mappedBy = "taskList")
-    private List<ManagerOrder> managerOrders;
+    @OneToOne
+    @JoinColumn(name = "manager_order_id", referencedColumnName = "id")
+    private ManagerOrder managerOrder;
 }

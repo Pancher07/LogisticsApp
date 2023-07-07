@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -28,58 +25,32 @@ public class ProjectController {
     public ResponseEntity<?> getAll() {
         List<ProjectDTO> projectDTOList = projectService.getAll().stream()
                 .map(projectService::convertToProjectDTO).toList();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/projects");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", projectDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(projectDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         ProjectDTO projectDTO = projectService.convertToProjectDTO(projectService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/projects/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", projectDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(projectDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid ProjectDTO projectDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         Project project = projectService.create(projectService.convertToProject(projectDTO));
-
         ProjectDTO projectDTOResponse = projectService.convertToProjectDTO(project);
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("header", "URL: /api/projects");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", projectDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(projectDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid ProjectDTO projectDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         Project updatedProject = projectService.readById(id);
-
         projectService.update(updatedProject, projectDTO);
-
         ProjectDTO projectDTOResponse = projectService.convertToProjectDTO(updatedProject);
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("header", "URL: /api/projects/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", projectDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(projectDTOResponse);
     }
 
     @DeleteMapping("/{id}")

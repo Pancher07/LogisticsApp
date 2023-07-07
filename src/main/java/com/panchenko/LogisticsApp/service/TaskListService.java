@@ -16,6 +16,8 @@ public interface TaskListService {
 
     List<TaskList> getAll();
 
+    List<TaskList> getByLogisticianId(long id);
+
     TaskList convertToTaskList(TaskListDTO taskListDTO);
 
     TaskListDTO convertToTaskListDTO(TaskList taskList);

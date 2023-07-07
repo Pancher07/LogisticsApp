@@ -27,56 +27,33 @@ public class TruckTractorController {
     public ResponseEntity<?> getAll() {
         List<TruckTractorDTO> truckTractorDTOList = truckTractorService.getAll().stream()
                 .map(truckTractorService::convertToTruckTractorDTO).toList();
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/truck-tractors");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", truckTractorDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(truckTractorDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         TruckTractorDTO truckTractorDTO = truckTractorService.convertToTruckTractorDTO(truckTractorService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/truck-tractors/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", truckTractorDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(truckTractorDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid TruckTractorDTO truckTractorDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         TruckTractor truckTractor = truckTractorService
                 .create(truckTractorService.convertToTruckTractor(truckTractorDTO));
-
         TruckTractorDTO truckTractorDTOResponse = truckTractorService.convertToTruckTractorDTO(truckTractor);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/truck-tractors");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", truckTractorDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(truckTractorDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TruckTractorDTO truckTractorDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         TruckTractor updatedTruckTractor = truckTractorService.readById(id);
-
         truckTractorService.update(updatedTruckTractor, truckTractorDTO);
-
         TruckTractorDTO truckTractorDTOResponse = truckTractorService.convertToTruckTractorDTO(updatedTruckTractor);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/truck-tractors/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", truckTractorDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(truckTractorDTOResponse);
     }
 
     @DeleteMapping("/{id}")

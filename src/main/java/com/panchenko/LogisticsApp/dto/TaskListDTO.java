@@ -8,4 +8,6 @@ import lombok.Data;
 public class TaskListDTO {
     private TaskListAndOrderStatus status;
     private Long logisticianId;
+    private Long loadingOrderId;
+    private Long managerOrder;
 }

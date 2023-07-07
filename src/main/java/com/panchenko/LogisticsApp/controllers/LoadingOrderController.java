@@ -10,9 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/loading-orders")
@@ -27,55 +25,32 @@ public class LoadingOrderController {
     public ResponseEntity<?> getAll() {
         List<LoadingOrderDTO> loadingOrderDTOList = loadingOrderService.getAll().stream()
                 .map(loadingOrderService::convertToLoadingOrderDTO).toList();
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/loading-orders");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(loadingOrderDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         LoadingOrderDTO loadingOrderDTO = loadingOrderService.convertToLoadingOrderDTO(loadingOrderService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/loading-orders/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(loadingOrderDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid LoadingOrderDTO loadingOrderDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         LoadingOrder loadingOrder = loadingOrderService.create(loadingOrderService.convertToLoadingOrder(loadingOrderDTO));
-
         LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(loadingOrder);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/loading-orders");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", loadingOrderDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(loadingOrderDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid LoadingOrderDTO loadingOrderDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         LoadingOrder updatedLoadingOrder = loadingOrderService.readById(id);
-
         loadingOrderService.update(updatedLoadingOrder, loadingOrderDTO);
-
         LoadingOrderDTO loadingOrderDTOResponse = loadingOrderService.convertToLoadingOrderDTO(updatedLoadingOrder);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/loading-orders/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", loadingOrderDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(loadingOrderDTOResponse);
     }
 
     @DeleteMapping("/{id}")

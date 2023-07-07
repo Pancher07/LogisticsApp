@@ -1,8 +1,10 @@
 package com.panchenko.LogisticsApp.controllers;
 
+import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.dto.TaskListDTO;
 import com.panchenko.LogisticsApp.model.TaskList;
-import com.panchenko.LogisticsApp.service.LogisticianService;
+import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
+import com.panchenko.LogisticsApp.service.ManagerOrderService;
 import com.panchenko.LogisticsApp.service.TaskListService;
 import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
@@ -11,12 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/task-lists")
+@RequestMapping("/api/tasks")
 public class TaskListController {
     private final TaskListService taskListService;
 
@@ -28,57 +28,38 @@ public class TaskListController {
     public ResponseEntity<?> getAll() {
         List<TaskListDTO> taskListDTOList = taskListService.getAll().stream()
                 .map(taskListService::convertToTaskListDTO).toList();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/task-list");
-        map.put("status code", HttpStatus.OK);
-        map.put("body", taskListDTOList);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(taskListDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable long id) {
         TaskListDTO taskListDTO = taskListService.convertToTaskListDTO(taskListService.readById(id));
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/task-list/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", taskListDTO);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(taskListDTO);
+    }
+
+    @GetMapping("/logist/{id}")
+    public ResponseEntity<?> getByLogistician(@PathVariable long id) {
+        TaskListDTO taskListDTO = taskListService.convertToTaskListDTO(taskListService.readById(id));
+        return ResponseEntity.ok(taskListDTO);
     }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody @Valid TaskListDTO taskListDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
-
         TaskList taskList = taskListService.create(taskListService.convertToTaskList(taskListDTO));
-
         TaskListDTO taskListDTOResponse = taskListService.convertToTaskListDTO(taskList);
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("header", "URL: /api/task-list");
-        map.put("status code", HttpStatus.CREATED);
-        map.put("body", taskListDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(taskListDTOResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid TaskListDTO taskListDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
-
         TaskList updatedTaskList = taskListService.readById(id);
-
         taskListService.update(updatedTaskList, taskListDTO);
-
         TaskListDTO taskListDTOResponse = taskListService.convertToTaskListDTO(updatedTaskList);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("header", "URL: /api/task-list/" + id);
-        map.put("status code", HttpStatus.OK);
-        map.put("body", taskListDTOResponse);
-        return ResponseEntity.ok(map);
+        return ResponseEntity.ok(taskListDTOResponse);
     }
 
     @DeleteMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.panchenko.LogisticsApp.model;
 
+import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -27,6 +28,9 @@ public class Hitch {
 
     @Column(name = "vehicle_status", nullable = false)
     private VehicleStatus vehicleStatus;
+
+    @Column(name = "loaded_with_product")
+    private TypeOfLightProduct loadedWithProduct;
 
     @OneToOne
     @JoinColumn(name = "truckTractor_id", referencedColumnName = "id", nullable = false)

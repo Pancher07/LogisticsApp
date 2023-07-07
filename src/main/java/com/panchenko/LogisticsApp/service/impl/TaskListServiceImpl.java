@@ -42,6 +42,11 @@ public class TaskListServiceImpl implements TaskListService {
     }
 
     @Override
+    public List<TaskList> getByLogisticianId(long id) {
+        return taskListRepository.findByLogistician(logisticianService.readById(id));
+    }
+
+    @Override
     public TaskList update(TaskList updatedTaskList, TaskListDTO taskListDTO) {
         if (updatedTaskList == null) {
             throw new NullEntityReferenceException("Task list cannot be 'null'");

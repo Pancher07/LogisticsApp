@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 
 @Data
 public class ManagerOrderDTO {
+    private Long id;
     private TypeOfLightProduct typeOfLightProduct;
-    private double volume;
+    private Double volume;
     private PresenceOfPumpOrCalibration pump;
     private PresenceOfPumpOrCalibration calibration;
     private String contact;

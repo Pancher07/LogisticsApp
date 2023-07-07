@@ -41,8 +41,7 @@ public class LoadingOrder {
     @Column(name = "status", nullable = false)
     private TaskListAndOrderStatus orderStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "task_list_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "loadingOrder", cascade = CascadeType.REMOVE)
     private TaskList taskList;
 
     @ManyToMany
