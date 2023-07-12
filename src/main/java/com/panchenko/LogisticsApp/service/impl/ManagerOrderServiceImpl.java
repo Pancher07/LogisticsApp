@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
+import com.panchenko.LogisticsApp.dto.SelectNextDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.Manager;
@@ -16,7 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ManagerOrderServiceImpl implements ManagerOrderService {
@@ -135,7 +136,42 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
     }
 
     @Override
-    public Hitch selectHitch(ManagerOrder managerOrder/*, List<Hitch> skippedHitch*/) {
+    public Hitch selectHitch(ManagerOrder managerOrder) {
+        List<Hitch> hitches = selectingLogic(managerOrder);
+        List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
+                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
+                .toList();
+        return resultList.get(0);
+    }
+
+    @Override
+    public SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch) {
+        List<Hitch> hitches = selectingLogic(managerOrder);
+
+        //Якщо залишається тільки 1 Hitch, не додаємо його skippedHitches
+        //доробити логіку щоб разом із останнім Hitch поверталося повідомлення,що це останній Hitch із списку
+        if (skippedHitchesId.size() + 1 != hitches.size()) {
+            skippedHitchesId.add(skippedHitch.getId());
+        }
+
+        Iterator<Hitch> iterator = hitches.iterator();
+        while (iterator.hasNext()) {
+            Hitch nextHitch = iterator.next();
+            for (Long hitchId : skippedHitchesId) {
+                if (Objects.equals(nextHitch.getId(), hitchId)) {
+                    iterator.remove();
+                }
+            }
+        }
+
+        List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
+                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
+                .toList();
+
+        return new SelectNextDTO(resultList.get(0).getId(), skippedHitchesId);
+    }
+
+    private List<Hitch> selectingLogic(ManagerOrder managerOrder) {
         List<Hitch> loadedHitches =
                 switch (managerOrder.getTypeOfLightProduct()) {
                     case DIESEL_FUEL -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
@@ -146,28 +182,23 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
             throw new NullEntityReferenceException("The program cannot select a hitch because there is no hitch that " +
                     "matches the selection criteria");
         }
-        List<Hitch> hitches = loadedHitches.stream()
+        List<Hitch> hitches = new ArrayList<>(loadedHitches.stream()
                 .filter(hitch -> managerOrder.getVolume() == hitch.getTrailer().getVolume())
                 .filter(hitch -> managerOrder.getCalibration().equals(PresenceOfPumpOrCalibration.YES) ?
                         managerOrder.getCalibration() == hitch.getTrailer().getCalibration() :
                         managerOrder.getCalibration() == hitch.getTrailer().getCalibration() ||
                                 managerOrder.getCalibration() != hitch.getTrailer().getCalibration())
-                .toList();
+                .toList());
 
         if (hitches.isEmpty()) {
             throw new NullEntityReferenceException("The program cannot select a hitch because there is no hitch that " +
                     "matches the selection criteria");
         }
-        List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
-                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
-                .toList();
-
-        return resultList.get(0);
+        return hitches;
     }
 
     @Override
-    public ManagerOrder approveHitch(Long managerOrderId, Hitch hitch) {
-        ManagerOrder managerOrder = readById(managerOrderId);
+    public ManagerOrder approveHitch(ManagerOrder managerOrder, Hitch hitch) {
         if (managerOrder == null || hitch == null) {
             throw new NullEntityReferenceException("managerOrderId or hitch cannot be null");
         }

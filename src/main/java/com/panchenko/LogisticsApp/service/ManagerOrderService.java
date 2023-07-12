@@ -1,6 +1,7 @@
 package com.panchenko.LogisticsApp.service;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
+import com.panchenko.LogisticsApp.dto.SelectNextDTO;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.Manager;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
@@ -30,7 +31,9 @@ public interface ManagerOrderService {
 
     Hitch selectHitch(ManagerOrder managerOrder/*, List<Hitch> skippedHitch*/);
 
-    ManagerOrder approveHitch(Long managerOrderId, Hitch hitch);
+    SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch);
+
+    ManagerOrder approveHitch(ManagerOrder managerOrder, Hitch hitch);
 
     List<ManagerOrder> getManagerOrdersByStatus(TaskListAndOrderStatus status);
 }

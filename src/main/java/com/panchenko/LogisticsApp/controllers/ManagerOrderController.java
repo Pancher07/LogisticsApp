@@ -1,8 +1,8 @@
 package com.panchenko.LogisticsApp.controllers;
 
 import com.panchenko.LogisticsApp.dto.HitchDTO;
-import com.panchenko.LogisticsApp.dto.ManagerDTO;
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
+import com.panchenko.LogisticsApp.dto.SelectNextDTO;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.ManagerOrder;
 import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
@@ -48,23 +48,23 @@ public class ManagerOrderController {
         return ResponseEntity.ok(newManagerOrdersDTOList);
     }
 
-    @GetMapping("/manager")
-    public ResponseEntity<?> getAllByManager(@RequestBody @Valid ManagerDTO managerDTO) {
+    @GetMapping("/manager/{manager-id}")
+    public ResponseEntity<?> getAllByManager(@PathVariable("manager-id") long managerId) {
         List<ManagerOrderDTO> managerOrderDTOList = managerOrderService
-                .getByManager(managerService.convertToManager(managerDTO)).stream()
+                .getByManager(managerService.readById(managerId)).stream()
                 .map(managerOrderService::convertToManagerOrderDTO).toList();
         return ResponseEntity.ok(managerOrderDTOList);
     }
 
-    @GetMapping("/{order_id}")
-    public ResponseEntity<?> getById(@PathVariable("order_id") long orderId) {
+    @GetMapping("/{order-id}")
+    public ResponseEntity<?> getById(@PathVariable("order-id") long orderId) {
         ManagerOrderDTO managerOrderDTO = managerOrderService
                 .convertToManagerOrderDTO(managerOrderService.readById(orderId));
         return ResponseEntity.ok(managerOrderDTO);
     }
 
-    @PostMapping("/manager/{manager_id}")
-    public ResponseEntity<?> create(@PathVariable("manager_id") long managerId,
+    @PostMapping("/manager/{manager-id}")
+    public ResponseEntity<?> create(@PathVariable("manager-id") long managerId,
                                     @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForCreate(bindingResult);
@@ -74,8 +74,8 @@ public class ManagerOrderController {
         return ResponseEntity.ok(managerOrderDTOResponse);
     }
 
-    @PutMapping("/{order_id}")
-    public ResponseEntity<?> update(@PathVariable("manager_id") long managerId, @PathVariable("order_id") long orderId,
+    @PutMapping("/{order-id}")
+    public ResponseEntity<?> update(@PathVariable("order-id") long orderId,
                                     @RequestBody @Valid ManagerOrderDTO managerOrderDTO,
                                     BindingResult bindingResult) {
         CheckErrors.checkErrorsForUpdate(bindingResult);
@@ -85,41 +85,40 @@ public class ManagerOrderController {
         return ResponseEntity.ok(managerOrderDTOResponse);
     }
 
-    @DeleteMapping("/{order_id}")
-    public ResponseEntity<HttpStatus> deleteById(@PathVariable("order_id") long orderId) {
+    @DeleteMapping("/{order-id}")
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable("order-id") long orderId) {
         managerOrderService.delete(orderId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping("/select-hitch")
-    public ResponseEntity<?> selectHitch(@RequestBody ManagerOrderDTO managerOrderDTO) {
+    @GetMapping("/{manager-order-id}/select-hitch")
+    public ResponseEntity<?> selectHitch(@PathVariable("manager-order-id") long managerOrderId) {
         Hitch selectedHitch = managerOrderService
-                .selectHitch(managerOrderService.convertToManagerOrder(managerOrderDTO));
+                .selectHitch(managerOrderService.readById(managerOrderId));
         HitchDTO selectedHitchDTOResponse = hitchService.convertToHitchDTO(selectedHitch);
         return ResponseEntity.ok(selectedHitchDTOResponse);
     }
 
+    @GetMapping("/{manager-order-id}/select-hitch/next")
+    public ResponseEntity<?> selectNextHitch(@PathVariable("manager-order-id") long managerOrderId,
+                                             @RequestParam("skipped-hitches") long skippedHitchId,
+                                             @RequestBody List<Long> skippedHitchesId) {
+        SelectNextDTO selectNextDTO = managerOrderService
+                .selectNextHitch(managerOrderService.readById(managerOrderId),
+                        skippedHitchesId, hitchService.readById(skippedHitchId));
+
+        return ResponseEntity.ok(selectNextDTO);
+    }
+
     @PutMapping("/approve-hitch")
-    public ResponseEntity<?> approveHitch(@RequestBody ManagerOrderDTO managerOrderDTO) {
+    public ResponseEntity<?> approveHitch(@RequestParam("manager-order-id") long managerOrderId,
+                                          @RequestParam("hitch-id") long hitchId) {
+        ManagerOrder managerOrder = managerOrderService.readById(managerOrderId);
         ManagerOrder updatedOrder = managerOrderService.
-                approveHitch(managerOrderService.convertToManagerOrder(managerOrderDTO).getId(),
-                        hitchService.readById(managerOrderDTO.getHitchId()));
+                approveHitch(managerOrder, hitchService.readById(hitchId));
 
         ManagerOrderDTO managerOrderDTOResponse = managerOrderService
                 .convertToManagerOrderDTO(updatedOrder);
         return ResponseEntity.ok(managerOrderDTOResponse);
     }
-
-
-      /*@PostMapping("/select-hitch/next")
-    public ResponseEntity<?> selectNextHitch(@RequestBody ManagerOrderDTO managerOrderDTO) {
-
-        Hitch selectedHitch = managerOrderService
-                .selectNextHitch(managerOrderService.convertToManagerOrder(managerOrderDTO),
-                        );
-
-        HitchDTO selectedHitchDTOResponse = hitchService.convertToHitchDTO(selectedHitch);
-
-        return ResponseEntity.ok(selectedHitchDTOResponse);
-    }*/
 }

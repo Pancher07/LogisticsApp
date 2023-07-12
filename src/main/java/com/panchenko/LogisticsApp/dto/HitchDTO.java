@@ -8,6 +8,8 @@ import lombok.Data;
 
 @Data
 public class HitchDTO {
+    private Long id;
+
     private String location;
 
     private String comment;
