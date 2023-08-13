@@ -8,9 +8,11 @@ import java.util.List;
 public class SelectNextDTO {
     Long selectedHitchId;
     List<Long> skippedHitchesId;
+    String message;
 
-    public SelectNextDTO(Long selectedHitchId, List<Long> skippedHitchesId) {
+    public SelectNextDTO(Long selectedHitchId, List<Long> skippedHitchesId, String message) {
         this.selectedHitchId = selectedHitchId;
         this.skippedHitchesId = skippedHitchesId;
+        this.message = message;
     }
 }

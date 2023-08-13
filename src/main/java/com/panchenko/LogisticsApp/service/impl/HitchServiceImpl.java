@@ -3,6 +3,7 @@ package com.panchenko.LogisticsApp.service.impl;
 import com.panchenko.LogisticsApp.dto.HitchDTO;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
+import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import com.panchenko.LogisticsApp.repository.HitchRepository;
 import com.panchenko.LogisticsApp.service.*;
@@ -104,6 +105,11 @@ public class HitchServiceImpl implements HitchService {
 
     @Override
     public List<Hitch> getAllByVehicleStatus(VehicleStatus vehicleStatus) {
-       return hitchRepository.findAllByVehicleStatus(vehicleStatus).get();
+        return hitchRepository.findAllByVehicleStatus(vehicleStatus).get();
+    }
+
+    @Override
+    public List<Hitch> getAllByLoadedWithProduct(TypeOfLightProduct typeOfLightProduct) {
+        return hitchRepository.findAllByLoadedWithProduct(typeOfLightProduct).get();
     }
 }

@@ -29,7 +29,7 @@ public interface ManagerOrderService {
 
     ManagerOrderDTO convertToManagerOrderDTO(ManagerOrder managerOrder);
 
-    Hitch selectHitch(ManagerOrder managerOrder/*, List<Hitch> skippedHitch*/);
+    Hitch selectHitch(ManagerOrder managerOrder);
 
     SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch);
 

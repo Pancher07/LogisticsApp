@@ -56,7 +56,7 @@ public class ManagerOrder {
     @OneToOne(mappedBy = "managerOrder", cascade = CascadeType.REMOVE)
     private TaskList taskList;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "hitch_id", referencedColumnName = "id")
     private Hitch hitch;
 }

@@ -63,4 +63,8 @@ VALUES (100, 0, 0, '2023-06-27 14:00:00', '2023-06-30 08:00:00', 'Измаил')
 
 INSERT INTO manager_orders (calibration, pump, status, type_of_product, volume, contractor_id, created_at, hitch_id,
                             manager_id, uploading_date_time, contact)
-VALUES (1, 0, 0, 0, 31000, 1, '2023-06-27 15:00:00', null, 1, '2023-06-28 14:00:00', 'contact +38050000000')
+VALUES (1, 0, 0, 0, 31000, 1, '2023-07-13 15:00:00', null, 1, '2023-07-14 14:00:00', 'contact +38050000000');
+
+INSERT INTO manager_orders (calibration, pump, status, type_of_product, volume, contractor_id, created_at, hitch_id,
+                            manager_id, uploading_date_time, contact)
+VALUES (1, 0, 0, 0, 31000, 1, '2023-06-14 11:00:00', null, 1, '2023-07-16 14:00:00', 'contact +380511111111')

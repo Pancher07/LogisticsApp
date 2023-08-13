@@ -9,6 +9,7 @@ import com.panchenko.LogisticsApp.model.ManagerOrder;
 import com.panchenko.LogisticsApp.model.TaskList;
 import com.panchenko.LogisticsApp.model.enumeration.PresenceOfPumpOrCalibration;
 import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
+import com.panchenko.LogisticsApp.model.enumeration.TypeOfLightProduct;
 import com.panchenko.LogisticsApp.model.enumeration.VehicleStatus;
 import com.panchenko.LogisticsApp.repository.ManagerOrderRepository;
 import com.panchenko.LogisticsApp.service.*;
@@ -137,52 +138,79 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
 
     @Override
     public Hitch selectHitch(ManagerOrder managerOrder) {
-        List<Hitch> hitches = selectingLogic(managerOrder);
-        List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
-                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
-                .toList();
-        return resultList.get(0);
+        if (managerOrder.getHitch() != null) {
+            return managerOrder.getHitch();
+        } else {
+            List<Hitch> hitches = selectingLogic(managerOrder);
+            return getResultHitch(managerOrder, hitches);
+        }
     }
 
     @Override
     public SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch) {
+        skippedHitch.setVehicleStatus(VehicleStatus.LOADED);
+        hitchService.update(skippedHitch, hitchService.convertToHitchDTO(skippedHitch));
+
         List<Hitch> hitches = selectingLogic(managerOrder);
 
-        //Якщо залишається тільки 1 Hitch, не додаємо його skippedHitches
-        //доробити логіку щоб разом із останнім Hitch поверталося повідомлення,що це останній Hitch із списку
-        if (skippedHitchesId.size() + 1 != hitches.size()) {
-            skippedHitchesId.add(skippedHitch.getId());
-        }
+        String message = null;
 
-        Iterator<Hitch> iterator = hitches.iterator();
-        while (iterator.hasNext()) {
-            Hitch nextHitch = iterator.next();
-            for (Long hitchId : skippedHitchesId) {
-                if (Objects.equals(nextHitch.getId(), hitchId)) {
-                    iterator.remove();
+
+        if (skippedHitchesId.size() + 1 >= hitches.size()) {
+            skippedHitch.setVehicleStatus(VehicleStatus.BOOKED_BY_ORDER);
+            hitchService.update(skippedHitch, hitchService.convertToHitchDTO(skippedHitch));
+            message = "Це останнє доступне авто із списку";
+            return new SelectNextDTO(skippedHitch.getId(), skippedHitchesId, message);
+        } else {
+            skippedHitchesId.add(skippedHitch.getId());
+
+            managerOrder.setHitch(null);
+            managerOrderRepository.save(managerOrder);
+
+            Iterator<Hitch> iterator = hitches.iterator();
+            while (iterator.hasNext()) {
+                Hitch nextHitch = iterator.next();
+                for (Long hitchId : skippedHitchesId) {
+                    if (Objects.equals(nextHitch.getId(), hitchId)) {
+                        iterator.remove();
+                    }
                 }
             }
+
+            Hitch resultHitch = getResultHitch(managerOrder, hitches);
+
+            return new SelectNextDTO(resultHitch.getId(), skippedHitchesId, message);
         }
+    }
 
+    private Hitch getResultHitch(ManagerOrder managerOrder, List<Hitch> hitches) {
         List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
-                        .compareTo(hitch2.getDriver().getLastTimeWorked()))
-                .toList();
+                .compareTo(hitch2.getDriver().getLastTimeWorked())).toList();
 
-        return new SelectNextDTO(resultList.get(0).getId(), skippedHitchesId);
+        Hitch resultHitch = resultList.get(0);
+
+        resultHitch.setVehicleStatus(VehicleStatus.BOOKED_BY_ORDER);
+        hitchService.update(resultHitch, hitchService.convertToHitchDTO(resultHitch));
+
+        managerOrder.setHitch(resultHitch);
+        managerOrderRepository.save(managerOrder);
+
+        return resultHitch;
     }
 
     private List<Hitch> selectingLogic(ManagerOrder managerOrder) {
         List<Hitch> loadedHitches =
                 switch (managerOrder.getTypeOfLightProduct()) {
-                    case DIESEL_FUEL -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_DIESEL);
-                    case A95 -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A95);
-                    case A92 -> hitchService.getAllByVehicleStatus(VehicleStatus.LOADED_A92);
+                    case DIESEL_FUEL -> hitchService.getAllByLoadedWithProduct(TypeOfLightProduct.DIESEL_FUEL);
+                    case A95 -> hitchService.getAllByLoadedWithProduct(TypeOfLightProduct.A95);
+                    case A92 -> hitchService.getAllByLoadedWithProduct(TypeOfLightProduct.A92);
                 };
         if (loadedHitches.isEmpty()) {
             throw new NullEntityReferenceException("The program cannot select a hitch because there is no hitch that " +
                     "matches the selection criteria");
         }
         List<Hitch> hitches = new ArrayList<>(loadedHitches.stream()
+                .filter(hitch -> hitch.getVehicleStatus() == VehicleStatus.LOADED)
                 .filter(hitch -> managerOrder.getVolume() == hitch.getTrailer().getVolume())
                 .filter(hitch -> managerOrder.getCalibration().equals(PresenceOfPumpOrCalibration.YES) ?
                         managerOrder.getCalibration() == hitch.getTrailer().getCalibration() :
@@ -202,17 +230,11 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         if (managerOrder == null || hitch == null) {
             throw new NullEntityReferenceException("managerOrderId or hitch cannot be null");
         }
-        if (managerOrder.getHitch() == hitch) {
+        if (managerOrder.getHitch() == hitch && hitch.getVehicleStatus() == VehicleStatus.UNLOADING) {
             return managerOrder;
         }
-        if (managerOrder.getHitch() != null) {
-            managerOrder.getHitch().setVehicleStatus(
-                    switch (hitch.getLoadedWithProduct()) {
-                        case DIESEL_FUEL -> VehicleStatus.LOADED_DIESEL;
-                        case A95 -> VehicleStatus.LOADED_A95;
-                        case A92 -> VehicleStatus.LOADED_A92;
-                    }
-            );
+        if (managerOrder.getHitch() != null && managerOrder.getHitch() != hitch) {
+            managerOrder.getHitch().setVehicleStatus(VehicleStatus.LOADED);
             taskListService.delete(managerOrder.getTaskList().getId());
             managerOrder.setOrderStatus(TaskListAndOrderStatus.OPENED);
         }

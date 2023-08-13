@@ -101,8 +101,8 @@ public class ManagerOrderController {
 
     @GetMapping("/{manager-order-id}/select-hitch/next")
     public ResponseEntity<?> selectNextHitch(@PathVariable("manager-order-id") long managerOrderId,
-                                             @RequestParam("skipped-hitches") long skippedHitchId,
-                                             @RequestBody List<Long> skippedHitchesId) {
+                                             @RequestBody List<Long> skippedHitchesId,
+                                             @RequestParam("skipped-hitch") long skippedHitchId) {
         SelectNextDTO selectNextDTO = managerOrderService
                 .selectNextHitch(managerOrderService.readById(managerOrderId),
                         skippedHitchesId, hitchService.readById(skippedHitchId));
@@ -110,8 +110,8 @@ public class ManagerOrderController {
         return ResponseEntity.ok(selectNextDTO);
     }
 
-    @PutMapping("/approve-hitch")
-    public ResponseEntity<?> approveHitch(@RequestParam("manager-order-id") long managerOrderId,
+    @PutMapping("/{manager-order-id}/approve-hitch")
+    public ResponseEntity<?> approveHitch(@PathVariable("manager-order-id") long managerOrderId,
                                           @RequestParam("hitch-id") long hitchId) {
         ManagerOrder managerOrder = managerOrderService.readById(managerOrderId);
         ManagerOrder updatedOrder = managerOrderService.

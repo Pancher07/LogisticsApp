@@ -52,7 +52,7 @@ public class Hitch {
     @JoinColumn(name = "logistician_id", referencedColumnName = "id")
     private Logistician logistician;
 
-    @OneToOne(mappedBy = "hitch")
+    @OneToOne(mappedBy = "hitch", cascade = CascadeType.ALL)
     private ManagerOrder managerOrder;
 
     @ManyToMany(mappedBy = "hitches")
