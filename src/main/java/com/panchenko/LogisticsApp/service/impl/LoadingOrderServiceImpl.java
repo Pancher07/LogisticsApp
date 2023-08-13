@@ -61,9 +61,6 @@ public class LoadingOrderServiceImpl implements LoadingOrderService {
         if (loadingOrderDTO.getOrderStatus() != null) {
             updatedLoadingOrder.setOrderStatus(loadingOrderDTO.getOrderStatus());
         }
-        if (loadingOrderDTO.getTaskListId() != null) {
-            updatedLoadingOrder.setTaskList(taskListService.readById(loadingOrderDTO.getTaskListId()));
-        }
         return loadingOrderRepository.save(updatedLoadingOrder);
     }
 

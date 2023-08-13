@@ -21,6 +21,4 @@ public class LoadingOrderDTO {
     private LocalDateTime loadingDateTime;
 
     private TaskListAndOrderStatus orderStatus;
-
-    private Long taskListId;
 }

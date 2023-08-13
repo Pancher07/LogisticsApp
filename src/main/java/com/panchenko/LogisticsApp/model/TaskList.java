@@ -30,7 +30,7 @@ public class TaskList {
     @JoinColumn(name = "logistician_id", referencedColumnName = "id")
     private Logistician logistician;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "loading_order_id", referencedColumnName = "id")
     private LoadingOrder loadingOrder;
 
