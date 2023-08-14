@@ -2,6 +2,7 @@ package com.panchenko.LogisticsApp.service.impl;
 
 import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.dto.SelectNextDTO;
+import com.panchenko.LogisticsApp.exception.EntityNotAllowedToReceiveException;
 import com.panchenko.LogisticsApp.exception.NullEntityReferenceException;
 import com.panchenko.LogisticsApp.model.Hitch;
 import com.panchenko.LogisticsApp.model.Manager;
@@ -138,34 +139,38 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
 
     @Override
     public Hitch selectHitch(ManagerOrder managerOrder) {
-        if (managerOrder.getHitch() != null) {
+        if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() != VehicleStatus.BOOKED_BY_ORDER) {
+            throw new EntityNotAllowedToReceiveException("Заявка в роботі, авто вже визначено: " +
+                    managerOrder.getHitch().getTruckTractor().getPlateNumber());
+        } else if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() == VehicleStatus.BOOKED_BY_ORDER){
             return managerOrder.getHitch();
-        } else {
+        }else {
             List<Hitch> hitches = selectingLogic(managerOrder);
-            return getResultHitch(managerOrder, hitches);
+            return setResultHitch(managerOrder, hitches);
         }
     }
 
     @Override
     public SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch) {
+        if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() != VehicleStatus.BOOKED_BY_ORDER) {
+            throw new EntityNotAllowedToReceiveException("Заявка в роботі, авто вже визначено: " +
+                    managerOrder.getHitch().getTruckTractor().getPlateNumber());
+        }
+
         skippedHitch.setVehicleStatus(VehicleStatus.LOADED);
-        hitchService.update(skippedHitch, hitchService.convertToHitchDTO(skippedHitch));
 
         List<Hitch> hitches = selectingLogic(managerOrder);
 
         String message = null;
 
-
         if (skippedHitchesId.size() + 1 >= hitches.size()) {
             skippedHitch.setVehicleStatus(VehicleStatus.BOOKED_BY_ORDER);
-            hitchService.update(skippedHitch, hitchService.convertToHitchDTO(skippedHitch));
             message = "Це останнє доступне авто із списку";
             return new SelectNextDTO(skippedHitch.getId(), skippedHitchesId, message);
         } else {
             skippedHitchesId.add(skippedHitch.getId());
 
             managerOrder.setHitch(null);
-            managerOrderRepository.save(managerOrder);
 
             Iterator<Hitch> iterator = hitches.iterator();
             while (iterator.hasNext()) {
@@ -176,21 +181,19 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
                     }
                 }
             }
-
-            Hitch resultHitch = getResultHitch(managerOrder, hitches);
+            Hitch resultHitch = setResultHitch(managerOrder, hitches);
 
             return new SelectNextDTO(resultHitch.getId(), skippedHitchesId, message);
         }
     }
 
-    private Hitch getResultHitch(ManagerOrder managerOrder, List<Hitch> hitches) {
+    private Hitch setResultHitch(ManagerOrder managerOrder, List<Hitch> hitches) {
         List<Hitch> resultList = hitches.stream().sorted((hitch1, hitch2) -> hitch1.getDriver().getLastTimeWorked()
                 .compareTo(hitch2.getDriver().getLastTimeWorked())).toList();
 
         Hitch resultHitch = resultList.get(0);
 
         resultHitch.setVehicleStatus(VehicleStatus.BOOKED_BY_ORDER);
-        hitchService.update(resultHitch, hitchService.convertToHitchDTO(resultHitch));
 
         managerOrder.setHitch(resultHitch);
         managerOrderRepository.save(managerOrder);
@@ -230,18 +233,23 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         if (managerOrder == null || hitch == null) {
             throw new NullEntityReferenceException("managerOrderId or hitch cannot be null");
         }
+        if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() != VehicleStatus.BOOKED_BY_ORDER) {
+            throw new EntityNotAllowedToReceiveException("Заявка в роботі, авто вже визначено: " +
+                    managerOrder.getHitch().getTruckTractor().getPlateNumber());
+        }
         if (managerOrder.getHitch() == hitch && hitch.getVehicleStatus() == VehicleStatus.UNLOADING) {
             return managerOrder;
         }
         if (managerOrder.getHitch() != null && managerOrder.getHitch() != hitch) {
             managerOrder.getHitch().setVehicleStatus(VehicleStatus.LOADED);
-            taskListService.delete(managerOrder.getTaskList().getId());
+            //taskListService.delete(managerOrder.getTaskList().getId());
             managerOrder.setOrderStatus(TaskListAndOrderStatus.OPENED);
         }
 
         managerOrder.setHitch(hitch);
         managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
         hitch.setVehicleStatus(VehicleStatus.UNLOADING);
+        hitch.getDriver().setLastTimeWorked(LocalDateTime.now());
 
         TaskList taskList = new TaskList();
         taskList.setCreatedAt(LocalDateTime.now());

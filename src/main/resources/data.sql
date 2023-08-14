@@ -61,6 +61,9 @@ VALUES (0, 3, 1, 1, 3, 3, 'no comment', 'Измаил', 0);
 INSERT INTO loading_orders (count_of_vehicle, petroleum_type, status, created_at, loading_date_time, loading_point)
 VALUES (100, 0, 0, '2023-06-27 14:00:00', '2023-06-30 08:00:00', 'Измаил');
 
+INSERT INTO loading_orders (count_of_vehicle, petroleum_type, status, created_at, loading_date_time, loading_point)
+VALUES (2, 0, 0, '2023-08-14 14:00:00', '2023-08-30 08:00:00', 'Одесса');
+
 INSERT INTO manager_orders (calibration, pump, status, type_of_product, volume, contractor_id, created_at, hitch_id,
                             manager_id, uploading_date_time, contact)
 VALUES (1, 0, 0, 0, 31000, 1, '2023-07-13 15:00:00', null, 1, '2023-07-14 14:00:00', 'contact +38050000000');

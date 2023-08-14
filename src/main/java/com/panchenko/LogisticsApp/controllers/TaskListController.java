@@ -1,10 +1,7 @@
 package com.panchenko.LogisticsApp.controllers;
 
-import com.panchenko.LogisticsApp.dto.ManagerOrderDTO;
 import com.panchenko.LogisticsApp.dto.TaskListDTO;
 import com.panchenko.LogisticsApp.model.TaskList;
-import com.panchenko.LogisticsApp.model.enumeration.TaskListAndOrderStatus;
-import com.panchenko.LogisticsApp.service.ManagerOrderService;
 import com.panchenko.LogisticsApp.service.TaskListService;
 import com.panchenko.LogisticsApp.util.CheckErrors;
 import jakarta.validation.Valid;
