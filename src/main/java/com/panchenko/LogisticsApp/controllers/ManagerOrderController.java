@@ -42,7 +42,7 @@ public class ManagerOrderController {
     @GetMapping("/new")
     public ResponseEntity<?> getAllNewManagersOrders() {
         List<ManagerOrderDTO> newManagerOrdersDTOList = managerOrderService
-                .getManagerOrdersByStatus(TaskListAndOrderStatus.OPENED)
+                .getManagerOrdersByStatus(TaskListAndOrderStatus.NEW)
                 .stream()
                 .map(managerOrderService::convertToManagerOrderDTO).toList();
         return ResponseEntity.ok(newManagerOrdersDTOList);
@@ -116,6 +116,18 @@ public class ManagerOrderController {
         ManagerOrder managerOrder = managerOrderService.readById(managerOrderId);
         ManagerOrder updatedOrder = managerOrderService.
                 approveHitch(managerOrder, hitchService.readById(hitchId));
+
+        ManagerOrderDTO managerOrderDTOResponse = managerOrderService
+                .convertToManagerOrderDTO(updatedOrder);
+        return ResponseEntity.ok(managerOrderDTOResponse);
+    }
+
+    @GetMapping("/{manager-order-id}/delete-hitch")
+    public ResponseEntity<?> deleteHitch(@PathVariable("manager-order-id") long managerOrderId,
+                                         @RequestParam("hitch-id") long hitchId) {
+        ManagerOrder managerOrder = managerOrderService.readById(managerOrderId);
+        ManagerOrder updatedOrder = managerOrderService.
+                deleteHitch(managerOrder, hitchService.readById(hitchId));
 
         ManagerOrderDTO managerOrderDTOResponse = managerOrderService
                 .convertToManagerOrderDTO(updatedOrder);

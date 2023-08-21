@@ -142,9 +142,9 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() != VehicleStatus.BOOKED_BY_ORDER) {
             throw new EntityNotAllowedToReceiveException("Заявка в роботі, авто вже визначено: " +
                     managerOrder.getHitch().getTruckTractor().getPlateNumber());
-        } else if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() == VehicleStatus.BOOKED_BY_ORDER){
+        } else if (managerOrder.getHitch() != null && managerOrder.getHitch().getVehicleStatus() == VehicleStatus.BOOKED_BY_ORDER) {
             return managerOrder.getHitch();
-        }else {
+        } else {
             List<Hitch> hitches = selectingLogic(managerOrder);
             return setResultHitch(managerOrder, hitches);
         }
@@ -242,14 +242,13 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         }
         if (managerOrder.getHitch() != null && managerOrder.getHitch() != hitch) {
             managerOrder.getHitch().setVehicleStatus(VehicleStatus.LOADED);
-            //taskListService.delete(managerOrder.getTaskList().getId());
-            managerOrder.setOrderStatus(TaskListAndOrderStatus.OPENED);
+            managerOrder.setOrderStatus(TaskListAndOrderStatus.NEW);
         }
 
         managerOrder.setHitch(hitch);
         managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
         hitch.setVehicleStatus(VehicleStatus.UNLOADING);
-        hitch.getDriver().setLastTimeWorked(LocalDateTime.now());
+        //hitch.getDriver().setLastTimeWorked(LocalDateTime.now());
 
         TaskList taskList = new TaskList();
         taskList.setCreatedAt(LocalDateTime.now());
@@ -261,6 +260,26 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
 
         managerOrderRepository.save(managerOrder);
 
+        return managerOrder;
+    }
+
+    @Override
+    public ManagerOrder deleteHitch(ManagerOrder managerOrder, Hitch hitch) {
+        if (managerOrder.getHitch() == null){
+            throw new NullEntityReferenceException("Для данной заявки ещё не назначено авто");
+        }
+        if (hitch == null) {
+            throw new NullEntityReferenceException("hitch cannot be null");
+        }
+        if (!managerOrder.getHitch().getId().equals(hitch.getId())) {
+            throw new EntityNotAllowedToReceiveException("Удалить невозможно. Выбранное авто не совпадает с авто, " +
+                    "которое назначено для заявки.");
+        }
+        managerOrder.setHitch(null);
+        hitch.setVehicleStatus(VehicleStatus.LOADED);
+        managerOrder.setOrderStatus(TaskListAndOrderStatus.NEW);
+        managerOrderRepository.save(managerOrder);
+        taskListService.delete(managerOrder.getTaskList().getId());
         return managerOrder;
     }
 }

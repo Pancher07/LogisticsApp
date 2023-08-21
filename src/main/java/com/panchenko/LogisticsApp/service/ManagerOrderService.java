@@ -36,4 +36,5 @@ public interface ManagerOrderService {
     ManagerOrder approveHitch(ManagerOrder managerOrder, Hitch hitch);
 
     List<ManagerOrder> getManagerOrdersByStatus(TaskListAndOrderStatus status);
+    ManagerOrder deleteHitch(ManagerOrder managerOrder, Hitch hitch);
 }
