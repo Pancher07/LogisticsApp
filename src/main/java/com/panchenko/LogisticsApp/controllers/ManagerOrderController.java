@@ -101,11 +101,10 @@ public class ManagerOrderController {
 
     @GetMapping("/{manager-order-id}/select-hitch/next")
     public ResponseEntity<?> selectNextHitch(@PathVariable("manager-order-id") long managerOrderId,
-                                             @RequestBody List<Long> skippedHitchesId,
-                                             @RequestParam("skipped-hitch") long skippedHitchId) {
+                                             @RequestBody List<Long> skippedHitches) {
         SelectNextDTO selectNextDTO = managerOrderService
                 .selectNextHitch(managerOrderService.readById(managerOrderId),
-                        skippedHitchesId, hitchService.readById(skippedHitchId));
+                        skippedHitches);
 
         return ResponseEntity.ok(selectNextDTO);
     }

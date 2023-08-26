@@ -31,7 +31,7 @@ public interface ManagerOrderService {
 
     Hitch selectHitch(ManagerOrder managerOrder);
 
-    SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitchesId, Hitch skippedHitch);
+    SelectNextDTO selectNextHitch(ManagerOrder managerOrder, List<Long> skippedHitches);
 
     ManagerOrder approveHitch(ManagerOrder managerOrder, Hitch hitch);
 
