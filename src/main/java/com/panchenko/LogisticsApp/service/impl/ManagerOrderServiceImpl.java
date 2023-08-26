@@ -217,7 +217,7 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         }
         if (hitch.getManagerOrder() != null) {
             throw new EntityNotAllowedToReceiveException("Данное авто уже забронировано для заявки id=" +
-                    + hitch.getManagerOrder().getId() + ", выберите другое");
+                    +hitch.getManagerOrder().getId() + ", выберите другое");
         }
         managerOrder.setHitch(hitch);
         managerOrder.setOrderStatus(TaskListAndOrderStatus.IN_WORK);
@@ -250,8 +250,12 @@ public class ManagerOrderServiceImpl implements ManagerOrderService {
         managerOrder.setHitch(null);
         hitch.setVehicleStatus(VehicleStatus.LOADED);
         managerOrder.setOrderStatus(TaskListAndOrderStatus.NEW);
-        managerOrderRepository.save(managerOrder);
         taskListService.delete(managerOrder.getTaskList().getId());
+        managerOrder.setTaskList(null);     /*єдина причина для чого написав дану строку - без цього після виконання
+                                            методу deleteHitch, в ДТО що повертається, залишається taskListId,
+                                            хоча по факту в БД все що потрібно виконується (видаляється),
+                                            а з цією дією в ДТО все ок*/
+        managerOrderRepository.save(managerOrder);
         return managerOrder;
     }
 }
